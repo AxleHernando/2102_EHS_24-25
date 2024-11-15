@@ -10,20 +10,14 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     private Admin admin;
     private Inventory inventory;
     private SalesReport salesReport;
+    private EHUB_SALES_GUI_Login main;
     
     public Admin_Dashboard(EHUB_SALES_GUI_Login main, Admin admin, Inventory inventory, SalesReport salesReport) {
+        this.main = main;
         this.admin = admin;
         this.inventory = inventory;
         this.salesReport = salesReport;
         initComponents();
-        customizeComponents(main);
-    }
-    
-    private void customizeComponents(EHUB_SALES_GUI_Login main) {
-        btnBack.addActionListener(evt -> {
-            main.setVisible(true);
-            this.dispose();
-        });
     }
 
     @SuppressWarnings("unchecked")
@@ -83,7 +77,9 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        // TODO add your handling code here:
+        main.resetFields();
+        main.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed
 
     

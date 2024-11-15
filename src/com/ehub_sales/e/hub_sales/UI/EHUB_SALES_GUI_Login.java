@@ -12,12 +12,12 @@ public class EHUB_SALES_GUI_Login extends javax.swing.JFrame {
     private static EHUB_SALES_GUI_Login main = null;
     private final Inventory inventory = new Inventory();
     private final SalesReport salesReport = new SalesReport();
-    private final Admin admin = new Admin("A001", "admin", "admin", salesReport);
-    private final Customer customer = new Customer("C001", "customer", "customer");
+    private final Admin admin = new Admin("A001", "admin", "123", salesReport);
+    private final Customer customer = new Customer("C001", "customer", "123");
+    private String username, password;
     
     private EHUB_SALES_GUI_Login() {
         initComponents();
-        customizeComponents();
     }
 
     public static EHUB_SALES_GUI_Login getInstance() {
@@ -25,10 +25,6 @@ public class EHUB_SALES_GUI_Login extends javax.swing.JFrame {
             main = new EHUB_SALES_GUI_Login();
         }
         return main;
-    }
-
-    private void customizeComponents() {
-        btnLogin.addActionListener(evt -> logIn(txtUsername.getText(), new String(txtPassword.getPassword())));
     }
 
     private void logIn(String username, String password) {
@@ -45,6 +41,27 @@ public class EHUB_SALES_GUI_Login extends javax.swing.JFrame {
 
     private void showErrorMessage(String message) {
         JOptionPane.showMessageDialog(this, message, "Login Error", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    public String getUsername() {
+        return this.username;
+    }
+    
+    public String getPassword() {
+        return this.password;
+    }
+    
+    public void resetFields() {
+        txtUsername.setText("");
+        txtPassword.setText("");
     }
     
     @SuppressWarnings("unchecked")
@@ -164,15 +181,18 @@ public class EHUB_SALES_GUI_Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
     
     private void txtUsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsernameActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_txtUsernameActionPerformed
 
     private void btnSignUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignUpActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_btnSignUpActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        // TODO add your handling code here:
+        setUsername(txtUsername.getText());
+        setPassword(txtPassword.getText());
+        
+        logIn(getUsername(), getPassword());
     }//GEN-LAST:event_btnLoginActionPerformed
 
     /**

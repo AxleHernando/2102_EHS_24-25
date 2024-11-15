@@ -6,21 +6,15 @@ import com.ehub_sales.e.hub_sales.Users.Customer;
 
 public class Customer_Dashboard extends javax.swing.JFrame {
 
+    private EHUB_SALES_GUI_Login main;
     private Customer customer;
     private Inventory inventory;
     
     public Customer_Dashboard(EHUB_SALES_GUI_Login main, Customer customer, Inventory inventory) {
+        this.main = main;
         this.customer = customer;
         this.inventory = inventory;
         initComponents();
-        customizeComponents(main);
-    }
-    
-    private void customizeComponents(EHUB_SALES_GUI_Login main) {
-        btnBack.addActionListener(evt -> {
-            main.setVisible(true);
-            this.dispose();
-        });
     }
 
     @SuppressWarnings("unchecked")
@@ -38,6 +32,11 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         jLabel1.setText("Customer");
 
         btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -73,6 +72,12 @@ public class Customer_Dashboard extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        main.resetFields();
+        main.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnBackActionPerformed
 
     // Separate action method for viewing products
     private void viewProductsAction() {
