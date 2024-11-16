@@ -6,11 +6,11 @@ import com.ehub_sales.e.hub_sales.Users.Customer;
 
 public class Customer_Dashboard extends javax.swing.JFrame {
 
-    private EHUB_SALES_GUI_Login main;
+    private Login_Form main;
     private Customer customer;
     private Inventory inventory;
     
-    public Customer_Dashboard(EHUB_SALES_GUI_Login main, Customer customer, Inventory inventory) {
+    public Customer_Dashboard(Login_Form main, Customer customer, Inventory inventory) {
         this.main = main;
         this.customer = customer;
         this.inventory = inventory;
@@ -74,7 +74,6 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        main.resetFields();
         main.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed

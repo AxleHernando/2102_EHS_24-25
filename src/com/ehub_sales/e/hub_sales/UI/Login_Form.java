@@ -1,38 +1,43 @@
 package com.ehub_sales.e.hub_sales.UI;
 
+import java.sql.*;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.showMessageDialog;
+
 import com.ehub_sales.e.hub_sales.Sales.Inventory;
 import com.ehub_sales.e.hub_sales.Sales.SalesReport;
 import com.ehub_sales.e.hub_sales.Users.Admin;
 import com.ehub_sales.e.hub_sales.Users.Customer;
-import javax.swing.*;
 
 
-public class EHUB_SALES_GUI_Login extends javax.swing.JFrame {
+public class Login_Form extends javax.swing.JFrame {
     
-    private static EHUB_SALES_GUI_Login main = null;
+    private static Login_Form main = null;
     private final Inventory inventory = new Inventory();
     private final SalesReport salesReport = new SalesReport();
     private final Admin admin = new Admin("A001", "admin", "123", salesReport);
     private final Customer customer = new Customer("C001", "customer", "123");
     private String username, password;
     
-    private EHUB_SALES_GUI_Login() {
+    private Login_Form() {
         initComponents();
     }
 
-    public static EHUB_SALES_GUI_Login getInstance() {
+    public static Login_Form getInstance() {
         if (main == null) {
-            main = new EHUB_SALES_GUI_Login();
+            main = new Login_Form();
         }
         return main;
     }
 
     private void logIn(String username, String password) {
         if (admin.authenticate(username, password)) {
-            new Admin_Dashboard(getInstance(), admin, inventory, salesReport).setVisible(true);
+            new Admin_Dashboard(getInstance(), admin, inventory, salesReport){{setLocationRelativeTo(null);}}.setVisible(true);
             this.setVisible(false);
         } else if (customer.authenticate(username, password)) {
-            new Customer_Dashboard(getInstance(), customer, inventory).setVisible(true);
+            new Customer_Dashboard(getInstance(), customer, inventory){{setLocationRelativeTo(null);}}.setVisible(true);
             this.setVisible(false);
         } else {
             showErrorMessage("Invalid Credentials");
@@ -68,14 +73,18 @@ public class EHUB_SALES_GUI_Login extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         lblWelcome = new javax.swing.JLabel();
         lblUsername1 = new javax.swing.JLabel();
-        txtUsername = new javax.swing.JTextField();
         lblPassword = new javax.swing.JLabel();
         txtPassword = new javax.swing.JPasswordField();
         btnLogin = new javax.swing.JButton();
         btnSignUp = new javax.swing.JButton();
+        txtUsername = new javax.swing.JTextField();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("E-HUB SALES");
@@ -87,17 +96,10 @@ public class EHUB_SALES_GUI_Login extends javax.swing.JFrame {
 
         lblWelcome.setFont(new java.awt.Font("Helvetica", 1, 26)); // NOI18N
         lblWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblWelcome.setText("E-HUB SALES");
+        lblWelcome.setText("LOGIN");
 
         lblUsername1.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
         lblUsername1.setText("Username");
-
-        txtUsername.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        txtUsername.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtUsernameActionPerformed(evt);
-            }
-        });
 
         lblPassword.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
         lblPassword.setText("Password");
@@ -125,23 +127,32 @@ public class EHUB_SALES_GUI_Login extends javax.swing.JFrame {
             }
         });
 
+        txtUsername.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+
+        jRadioButton1.setText("Customer");
+
+        jRadioButton2.setText("Admin");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(20, 20, 20)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jRadioButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jRadioButton2))
                     .addComponent(lblUsername1)
-                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblPassword)
-                    .addComponent(lblWelcome, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(btnLogin)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnSignUp))
-                        .addComponent(txtPassword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(lblWelcome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnLogin)
+                        .addGap(64, 64, 64)
+                        .addComponent(btnSignUp))
+                    .addComponent(txtPassword)
+                    .addComponent(txtUsername))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -153,11 +164,15 @@ public class EHUB_SALES_GUI_Login extends javax.swing.JFrame {
                 .addComponent(lblUsername1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24)
-                .addComponent(lblPassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(30, 30, 30)
+                .addComponent(lblPassword)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jRadioButton1)
+                    .addComponent(jRadioButton2))
+                .addGap(14, 14, 14)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -174,38 +189,107 @@ public class EHUB_SALES_GUI_Login extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
-    private void txtUsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsernameActionPerformed
-        
-    }//GEN-LAST:event_txtUsernameActionPerformed
-
     private void btnSignUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignUpActionPerformed
-        
+        SignUp_Form signUp = new SignUp_Form();
+        signUp.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_btnSignUpActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        setUsername(txtUsername.getText());
-        setPassword(txtPassword.getText());
-        
-        logIn(getUsername(), getPassword());
+        // System.out.println("Sign up btn clicked");
+        String username, password, query, fname = null, passDb = null;
+        String SUrl, SUser, SPass;
+        SUrl = "jdbc:MySQL://localhost:3306/oop_ehub_sales";
+        SUser = "root";
+        SPass = "";
+        int notFound = 0;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(SUrl, SUser, SPass);
+            Statement st = con.createStatement();
+            if("".equals(txtUsername.getText())){
+                JOptionPane.showMessageDialog(new JFrame(), "Username is required.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }else if("".equals(txtPassword.getText())){
+                JOptionPane.showMessageDialog(new JFrame(), "Password is required.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }else {
+            username = txtUsername.getText();
+            password = txtPassword.getText();
+            
+            query = "SELECT * FROM user WHERE email= '"+username+"'";
+       
+            ResultSet rs = st.executeQuery(query);
+            while(rs.next()){
+                passDb = rs.getString("Password");
+                fname = rs.getString("Username");
+                notFound = 1;
+            }
+            if(notFound == 1 && txtPassword.equals(passDb)){
+                /*Home HomeFrame = new Home();
+                HomeFrame.setUser(fname);
+                HomeFrame.setVisible(true);
+                HomeFrame.pack();
+                HomeFrame.setLocationRelativeTo(null); 
+                this.dispose();*/
+            }else{
+               JOptionPane.showMessageDialog(new JFrame(), "Incorrect email or password", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            txtPassword.setText("");
+            
+            }
+        }catch(Exception e){
+           System.out.println("Error!" + e.getMessage()); 
+        }
     }//GEN-LAST:event_btnLoginActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> getInstance().setVisible(true));
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(SignUp_Form.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(SignUp_Form.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(SignUp_Form.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(SignUp_Form.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> {
+            Login_Form login = getInstance();
+            login.setLocationRelativeTo(null);
+            login.setVisible(true);
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogin;
     private javax.swing.JButton btnSignUp;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JLabel lblPassword;
     private javax.swing.JLabel lblUsername1;
     private javax.swing.JLabel lblWelcome;
