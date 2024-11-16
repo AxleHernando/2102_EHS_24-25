@@ -25,6 +25,7 @@ public class SignUp_Form extends javax.swing.JFrame {
         txtPassword = new javax.swing.JPasswordField();
         btnSignUp = new javax.swing.JButton();
         txtUsername = new javax.swing.JTextField();
+        btnBack = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -55,6 +56,15 @@ public class SignUp_Form extends javax.swing.JFrame {
 
         txtUsername.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
+        btnBack.setBackground(new java.awt.Color(153, 153, 255));
+        btnBack.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+        btnBack.setText("Go Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -65,7 +75,10 @@ public class SignUp_Form extends javax.swing.JFrame {
                     .addComponent(lblUsername1)
                     .addComponent(lblPassword)
                     .addComponent(lblWelcome, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
-                    .addComponent(btnSignUp, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnBack)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSignUp))
                     .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
                     .addComponent(txtUsername))
                 .addContainerGap(24, Short.MAX_VALUE))
@@ -84,7 +97,9 @@ public class SignUp_Form extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(35, 35, 35)
-                .addComponent(btnSignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(25, 25, 25))
         );
 
@@ -140,6 +155,12 @@ public class SignUp_Form extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnSignUpActionPerformed
 
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        Login_Form login = Login_Form.getInstance();
+        login.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnBackActionPerformed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -173,6 +194,7 @@ public class SignUp_Form extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBack;
     private javax.swing.JButton btnSignUp;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblPassword;
