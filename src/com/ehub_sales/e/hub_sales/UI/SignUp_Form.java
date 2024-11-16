@@ -122,7 +122,7 @@ public class SignUp_Form extends javax.swing.JFrame {
 
     private void btnSignUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignUpActionPerformed
         // System.out.println("Sign up btn clicked");
-        String username, password, query;
+        String username, password, queryUser, queryCustomer, queryGetUserID, role;
         String SUrl, SUser, SPass;
         SUrl = "jdbc:MySQL://localhost:3306/oop_ehub_sales";
         SUser = "root";
@@ -140,15 +140,34 @@ public class SignUp_Form extends javax.swing.JFrame {
             }else {
             username = txtUsername.getText(); 
             password = txtPassword.getText();
+            role = "Customer";
             System.out.println(password);
             
-            query = "INSERT INTO users(Username, Password)"+
-                    "VALUES('"+username+"', '"+password+"')";
+            queryUser = "INSERT INTO users(Username, Password, Role)"+
+                    "VALUES('"+username+"', '"+password+"', '"+role+"')";
             
-            st.execute(query);
+            st.execute(queryUser);
+            
+            queryGetUserID = "SELECT UserID FROM users WHERE Username = '" + username + "'";
+            
+            java.sql.ResultSet rs = st.executeQuery(queryGetUserID);
+            int userId = 0;
+            if (rs.next()) {
+                userId = rs.getInt("UserID");
+            }
+
+            if (userId > 0) {
+                queryCustomer = "INSERT INTO customer(UserID) VALUES(" + userId + ")";
+                st.executeUpdate(queryCustomer);
+            }
+                    
             txtUsername.setText("");
             txtPassword.setText("");
             showMessageDialog(null, "New account has been created successfully!");
+            
+            Login_Form login = Login_Form.getInstance();
+            login.setVisible(true);
+            this.setVisible(false);
             }
         }catch(Exception e){
            System.out.println("Error!" + e.getMessage()); 
