@@ -77,7 +77,8 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        main.setVisible(true);
+        Login_Form login = Login_Form.getInstance();
+        login.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed
 
