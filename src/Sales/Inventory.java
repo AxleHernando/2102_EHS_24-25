@@ -19,6 +19,7 @@ public class Inventory {
         String dbUrl = "jdbc:mysql://localhost:3306/oop_ehub_sales";
         String dbUser  = "root";
         String dbPassword = "";
+
         try (Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword)) {
             String query = "SELECT * FROM products";
             try (PreparedStatement ps = con.prepareStatement(query);
@@ -29,12 +30,17 @@ public class Inventory {
                     String description = rs.getString("Description");
                     double price = rs.getDouble("Price");
                     int quantity = rs.getInt("Quantity");
+
                     products.add(new Product(productId, name, description, price, quantity));
                 }
             }
         } catch (Exception e) {
             System.out.println("Error loading products: " + e.getMessage());
         }
+    }
+
+    public List<Product> getProducts() {
+        return products; // Method to retrieve the list of products
     }
 
     public void viewProducts() {

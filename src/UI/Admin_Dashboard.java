@@ -1,12 +1,7 @@
 package UI;
 
 import javax.swing.*;
-import Sales.Inventory;
 import Sales.Product;
-import Users.Admin;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class Admin_Dashboard extends javax.swing.JFrame {
     private DefaultListModel<Product> productListModel;

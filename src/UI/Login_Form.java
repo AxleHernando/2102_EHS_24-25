@@ -1,14 +1,8 @@
 package UI;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
 
-import Sales.Inventory;
-import Sales.SalesReport;
-import Users.Admin;
-import Users.Customer;
 
 public class Login_Form extends javax.swing.JFrame {
     private static Login_Form main = null;
