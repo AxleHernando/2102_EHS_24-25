@@ -20,7 +20,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     }
 
     private void loadProducts() {
-        String dbUrl = "jdbc:mysql://localhost:3306/oop_ehub_sales";
+        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
         String dbUser  = "root";
         String dbPassword = "";
 
@@ -35,7 +35,16 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     String productId = rs.getString("ProductID");
                     String name = rs.getString("Name");
                     double price = rs.getDouble("Price");
-                    String supplierName = rs.getString("Username");
+                    String supplierName = rs.getString("Username");                        
+                   
+                    if (name == null) {
+                        name = "N/A";
+                    }
+                    
+                    if (supplierName == null) {
+                        supplierName = "N/A";
+                    }
+
                     productTableModel.addRow(new Object[]{productId, name, "PHP " + price, supplierName});
                 }
             }
@@ -58,7 +67,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
 
     private void updateProductDetails(String productId) {
         // Get product details from the database
-        String dbUrl = "jdbc:mysql://localhost:3306/oop_ehub_sales";
+        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
         String dbUser  = "root";
         String dbPassword = "";
 
@@ -85,7 +94,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
 
     private String getSupplierName(String supplierId) {
         String supplierName = "";
-        String dbUrl = "jdbc:mysql://localhost:3306/oop_ehub_sales";
+        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
         String dbUser  = "root";
         String dbPassword = "";
 
@@ -167,10 +176,8 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         lblProductImage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         lblProductName.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
-        lblProductName.setText("Product Name");
 
         lblSupplierName.setFont(new java.awt.Font("Helvetica", 1, 14)); // NOI18N
-        lblSupplierName.setText("Supplier Name");
 
         btnPlusQuantity.setBackground(new java.awt.Color(153, 153, 255));
         btnPlusQuantity.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N

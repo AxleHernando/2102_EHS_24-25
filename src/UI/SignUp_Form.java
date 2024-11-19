@@ -141,7 +141,7 @@ public class SignUp_Form extends javax.swing.JFrame {
         String username = txtUsername.getText();
         String password = new String(txtPassword.getPassword());
         String role = (String) comboRole.getSelectedItem();
-        String dbUrl = "jdbc:mysql://localhost:3306/oop_ehub_sales";
+        String dbUrl = "jdbc:mysql://localhost:3306/2102_EHS_2425";
         String dbUser    = "root";
         String dbPassword = "";
 
@@ -151,9 +151,9 @@ public class SignUp_Form extends javax.swing.JFrame {
         }
 
         String insertUserQuery = "INSERT INTO users (Username, Password, Role) VALUES (?, ?, ?)";
-        String insertAdminQuery = "INSERT INTO admin (UserID) VALUES (?)";
-        String insertCustomerQuery = "INSERT INTO customer (UserID) VALUES (?)";
-        String insertSupplierQuery = "INSERT INTO supplier (UserID) VALUES (?)";
+        String insertAdminQuery = "INSERT INTO admins (UserID) VALUES (?)";
+        String insertCustomerQuery = "INSERT INTO customers (UserID) VALUES (?)";
+        String insertSupplierQuery = "INSERT INTO suppliers (UserID) VALUES (?)";
 
         try (Connection con = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
             PreparedStatement ps = con.prepareStatement(insertUserQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
