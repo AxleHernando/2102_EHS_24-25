@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 19, 2024 at 07:17 AM
+-- Generation Time: Nov 20, 2024 at 11:59 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -37,8 +37,7 @@ CREATE TABLE `admins` (
 --
 
 INSERT INTO `admins` (`AdminID`, `UserID`) VALUES
-(1, 2),
-(2, 4);
+(3, 6);
 
 -- --------------------------------------------------------
 
@@ -56,8 +55,21 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`CustomerID`, `UserID`) VALUES
-(1, 1),
-(2, 5);
+(3, 7);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orders`
+--
+
+CREATE TABLE `orders` (
+  `OrderID` int(11) NOT NULL,
+  `CustomerID` int(11) NOT NULL,
+  `ProductID` int(11) NOT NULL,
+  `Quantity` int(11) NOT NULL,
+  `OrderDate` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -78,11 +90,11 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`ProductID`, `Name`, `Description`, `Price`, `SupplierID`) VALUES
-(1, 'Laptop', 'High-End Gaming Laptop for Gamers', 50000.00, 6),
-(2, 'iPhone', 'Newly Launched High-End Mobile Phone', 40000.00, 6),
-(3, 'PlayStation 5', 'Next-Gen Gaming Console', 30000.00, 6),
-(4, 'Nintendo Switch', 'A Versatile Gaming Console', 20000.00, 6),
-(5, 'AirPods', 'Noise-Cancelling Earbuds', 15000.00, 6);
+(1, 'Laptop', 'High-End Gaming Laptop for Gamers', 50000.00, 8),
+(2, 'iPhone', 'Newly Launched High-End Mobile Phone', 40000.00, 8),
+(3, 'PlayStation 5', 'Next-Gen Gaming Console', 30000.00, 8),
+(4, 'Nintendo Switch', 'A Versatile Gaming Console', 20000.00, 8),
+(5, 'AirPods', 'Noise-Cancelling Earbuds', 15000.00, 8);
 
 -- --------------------------------------------------------
 
@@ -100,8 +112,7 @@ CREATE TABLE `suppliers` (
 --
 
 INSERT INTO `suppliers` (`SupplierID`, `UserID`) VALUES
-(1, 3),
-(2, 6);
+(3, 8);
 
 -- --------------------------------------------------------
 
@@ -113,20 +124,18 @@ CREATE TABLE `users` (
   `UserID` int(11) NOT NULL,
   `Username` varchar(100) DEFAULT NULL,
   `Password` varchar(100) DEFAULT NULL,
-  `Role` varchar(100) DEFAULT NULL
+  `Role` varchar(100) DEFAULT NULL,
+  `CreatedAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`UserID`, `Username`, `Password`, `Role`) VALUES
-(1, 'Customer', '123', 'Customer'),
-(2, 'Admin', '123', 'Admin'),
-(3, 'Supplier', '123', 'Supplier'),
-(4, 'LinuxAdona', 'Admin', 'Admin'),
-(5, 'AxleHernando', 'Customer', 'Customer'),
-(6, 'KayeMacalalad', 'Supplier', 'Supplier');
+INSERT INTO `users` (`UserID`, `Username`, `Password`, `Role`, `CreatedAt`) VALUES
+(6, 'Admin', 'admin123', 'Admin', '2024-11-20 10:53:58'),
+(7, 'Customer', 'cust123', 'Customer', '2024-11-20 10:56:36'),
+(8, 'Supplier', 'supp123', 'Supplier', '2024-11-20 10:57:37');
 
 --
 -- Indexes for dumped tables
@@ -144,6 +153,14 @@ ALTER TABLE `admins`
 --
 ALTER TABLE `customers`
   ADD PRIMARY KEY (`CustomerID`);
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`OrderID`),
+  ADD KEY `CustomerID` (`CustomerID`),
+  ADD KEY `ProductID` (`ProductID`);
 
 --
 -- Indexes for table `products`
@@ -173,13 +190,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `AdminID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `AdminID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `CustomerID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `CustomerID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `OrderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -191,13 +214,13 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `suppliers`
 --
 ALTER TABLE `suppliers`
-  MODIFY `SupplierID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `SupplierID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
@@ -208,6 +231,13 @@ ALTER TABLE `users`
 --
 ALTER TABLE `admins`
   ADD CONSTRAINT `admins_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
+
+--
+-- Constraints for table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`CustomerID`) REFERENCES `users` (`UserID`),
+  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`ProductID`) REFERENCES `products` (`ProductID`);
 
 --
 -- Constraints for table `products`

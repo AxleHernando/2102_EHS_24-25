@@ -1,11 +1,14 @@
 package UI;
 
+import Users.User;
+import Users.UserSession;
 import javax.swing.*;
 import java.sql.*;
 
 
 public class Login_Form extends javax.swing.JFrame {
     private static Login_Form main = null;
+    public static String loggedInUserID;
 
     private Login_Form() {
         initComponents();
@@ -177,12 +180,15 @@ public class Login_Form extends javax.swing.JFrame {
             if (rs.next()) {
                 String storedPassword = rs.getString("Password");
                 if (storedPassword.equals(password)) {
+                    loggedInUserID = rs.getString("UserID");
                     JOptionPane.showMessageDialog(this, "Welcome, " + username + "!", "Login Successful", JOptionPane.INFORMATION_MESSAGE);
                     String role = rs.getString("Role");
                     switch (role) {
                         case "Customer":
                             Customer_Dashboard customerDashboard = new Customer_Dashboard();
                             customerDashboard.setVisible(true);
+                            User loggedInUser  = new User(rs.getString("UserID"), username, storedPassword);
+                            UserSession.setCurrentUser(loggedInUser);
                             resetFields();
                             this.dispose();
                             break;

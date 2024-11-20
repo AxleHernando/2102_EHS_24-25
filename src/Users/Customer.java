@@ -7,7 +7,6 @@ import Sales.ShoppingCart;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.Map;
 
 public class Customer extends User {
@@ -55,7 +54,7 @@ public class Customer extends User {
             String insertOrderQuery = "INSERT INTO orders (CustomerID, ProductID, Quantity) VALUES (?, ?, ?)";
             for (Map.Entry<Product, Integer> entry : cart.getCartItems().entrySet()) {
                 try (PreparedStatement ps = con.prepareStatement(insertOrderQuery)) {
-                    ps.setString(1, getUserId());
+                    ps.setString(1, getUserID());
                     ps.setString(2, entry.getKey().getProductId());
                     ps.setInt(3, entry.getValue());
                     ps.executeUpdate();
