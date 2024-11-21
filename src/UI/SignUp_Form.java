@@ -33,7 +33,7 @@ public class SignUp_Form extends javax.swing.JFrame {
 
         lblWelcome.setFont(new java.awt.Font("Helvetica", 1, 26)); // NOI18N
         lblWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblWelcome.setText("E-HUB SALES");
+        lblWelcome.setText("Shopaloo");
 
         lblUsername1.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
         lblUsername1.setText("Username");

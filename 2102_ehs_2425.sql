@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 20, 2024 at 11:59 AM
+-- Generation Time: Nov 21, 2024 at 10:36 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -42,6 +42,23 @@ INSERT INTO `admins` (`AdminID`, `UserID`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `cardpayment`
+--
+
+CREATE TABLE `cardpayment` (
+  `CardID` int(11) NOT NULL,
+  `UserID` int(11) NOT NULL,
+  `CardNo` varchar(16) NOT NULL,
+  `CVC` varchar(4) NOT NULL,
+  `CardHolder` varchar(100) NOT NULL,
+  `Expiry` char(5) NOT NULL,
+  `Payment` decimal(10,2) NOT NULL,
+  `TransactionDate` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `customers`
 --
 
@@ -65,10 +82,13 @@ INSERT INTO `customers` (`CustomerID`, `UserID`) VALUES
 
 CREATE TABLE `orders` (
   `OrderID` int(11) NOT NULL,
-  `CustomerID` int(11) NOT NULL,
+  `UserID` int(11) DEFAULT NULL,
   `ProductID` int(11) NOT NULL,
   `Quantity` int(11) NOT NULL,
-  `OrderDate` timestamp NOT NULL DEFAULT current_timestamp()
+  `OrderDate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `Price` decimal(10,2) NOT NULL,
+  `Status` varchar(100) DEFAULT NULL,
+  `ModeOfPayment` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -149,6 +169,13 @@ ALTER TABLE `admins`
   ADD KEY `UserID` (`UserID`);
 
 --
+-- Indexes for table `cardpayment`
+--
+ALTER TABLE `cardpayment`
+  ADD PRIMARY KEY (`CardID`),
+  ADD KEY `UserID` (`UserID`);
+
+--
 -- Indexes for table `customers`
 --
 ALTER TABLE `customers`
@@ -159,7 +186,7 @@ ALTER TABLE `customers`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`OrderID`),
-  ADD KEY `CustomerID` (`CustomerID`),
+  ADD KEY `CustomerID` (`UserID`),
   ADD KEY `ProductID` (`ProductID`);
 
 --
@@ -193,6 +220,12 @@ ALTER TABLE `admins`
   MODIFY `AdminID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `cardpayment`
+--
+ALTER TABLE `cardpayment`
+  MODIFY `CardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
@@ -202,7 +235,7 @@ ALTER TABLE `customers`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `OrderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `OrderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -233,10 +266,16 @@ ALTER TABLE `admins`
   ADD CONSTRAINT `admins_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
 
 --
+-- Constraints for table `cardpayment`
+--
+ALTER TABLE `cardpayment`
+  ADD CONSTRAINT `cardpayment_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
+
+--
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`CustomerID`) REFERENCES `users` (`UserID`),
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`),
   ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`ProductID`) REFERENCES `products` (`ProductID`);
 
 --

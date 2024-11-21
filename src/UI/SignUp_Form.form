@@ -112,7 +112,7 @@
               <Font name="Helvetica" size="26" style="1"/>
             </Property>
             <Property name="horizontalAlignment" type="int" value="0"/>
-            <Property name="text" type="java.lang.String" value="E-HUB SALES"/>
+            <Property name="text" type="java.lang.String" value="Shopaloo"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblUsername1">
