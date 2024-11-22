@@ -1,13 +1,13 @@
 package UI;
 
+import Databases.DBConnection;
 import javax.swing.JOptionPane;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.Locale; 
 
 public class CardPayment extends javax.swing.JFrame {
 
@@ -16,7 +16,7 @@ public class CardPayment extends javax.swing.JFrame {
     public CardPayment(double total) {
         initComponents();
         this.totalAmount = total;
-        lblTotal.setText(NumberFormat.getCurrencyInstance(new Locale("en", "PH")).format(total)); // Set the total
+        lblTotal.setText(NumberFormat.getCurrencyInstance(new Locale("en", "PH")).format(total));
     }
     
     @SuppressWarnings("unchecked")
@@ -201,23 +201,17 @@ public class CardPayment extends javax.swing.JFrame {
         return txtCVC.getText().trim();
     }
 
-    // Method to validate the logged-in user
     private String getLoggedInUserID() {
-        String loggedInUserID = Login_Form.loggedInUserID; // Replace this with your session logic
+        String loggedInUserID = Login_Form.loggedInUserID;
         if (loggedInUserID == null || loggedInUserID.isEmpty()) {
             System.out.println("No logged-in user ID found.");
         }
         return loggedInUserID;
     }
 
-    // Validate customer ID in the database
     private boolean validateCustomerID(String customerId) {
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
-        String dbUser = "root";
-        String dbPassword = "";
-
         String checkCustomerQuery = "SELECT COUNT(*) FROM users WHERE UserID = ?";
-        try (Connection con = DriverManager.getConnection(dbUrl, dbUser, dbPassword); PreparedStatement ps = con.prepareStatement(checkCustomerQuery)) {
+        try (Connection con = DBConnection.Connect(); PreparedStatement ps = con.prepareStatement(checkCustomerQuery)) {
             ps.setString(1, customerId);
             ResultSet rs = ps.executeQuery();
             if (rs.next() && rs.getInt(1) > 0) {
@@ -259,12 +253,9 @@ public class CardPayment extends javax.swing.JFrame {
     }
 
     private void insertCardDetailsToDatabase(String customerId, String cardNumber, String cvc, String cardHolder, String expiryDate, double paymentAmount) {
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
-        String dbUser = "root";
-        String dbPassword = "";
-
         String insertCardQuery = "INSERT INTO CardPayment (UserID, CardNo, CVC, CardHolder, EXPIRY, Payment) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection con = DriverManager.getConnection(dbUrl, dbUser, dbPassword); PreparedStatement ps = con.prepareStatement(insertCardQuery)) {
+        try (Connection con = DBConnection.Connect(); 
+                PreparedStatement ps = con.prepareStatement(insertCardQuery)) {
             ps.setString(1, customerId);
             ps.setString(2, cardNumber);
             ps.setString(3, cvc);
@@ -289,17 +280,26 @@ public class CardPayment extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Invalid CustomerID.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        insertCardDetailsToDatabase(
-                customerId,
-                getCardNumber(),
-                getCVC(),
-                getCardHolder(),
-                getExpiryDate(),
-                totalAmount
-        );
         
-        this.dispose();
+        String message = "Do you want to proceed with checkout?";
+        int confirm = JOptionPane.showConfirmDialog(this, message,
+                "Confirm Checkout", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            insertCardDetailsToDatabase(
+                    customerId,
+                    getCardNumber(),
+                    getCVC(),
+                    getCardHolder(),
+                    getExpiryDate(),
+                    totalAmount
+            );
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Checkout canceled.", 
+                                  "Cancellation", JOptionPane.INFORMATION_MESSAGE);
+        }
     }//GEN-LAST:event_btnProceedActionPerformed
 
     /**

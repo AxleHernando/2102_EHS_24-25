@@ -1,7 +1,9 @@
 package UI;
 
+import Databases.DBConnection;
 import Users.User;
 import Users.UserSession;
+import java.awt.event.KeyEvent;
 import javax.swing.*;
 import java.sql.*;
 
@@ -64,6 +66,11 @@ public class Login_Form extends javax.swing.JFrame {
         lblPassword.setText("Password");
 
         txtPassword.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtPassword.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtPasswordKeyPressed(evt);
+            }
+        });
 
         btnLogin.setBackground(new java.awt.Color(153, 153, 255));
         btnLogin.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
@@ -79,6 +86,11 @@ public class Login_Form extends javax.swing.JFrame {
         btnLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLoginActionPerformed(evt);
+            }
+        });
+        btnLogin.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnLoginKeyPressed(evt);
             }
         });
 
@@ -163,9 +175,6 @@ public class Login_Form extends javax.swing.JFrame {
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
         String username = txtUsername.getText();
         String password = new String(txtPassword.getPassword());
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_EHS_2425";
-        String dbUser  = "root";
-        String dbPassword = "";
 
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in both username and password.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -173,7 +182,7 @@ public class Login_Form extends javax.swing.JFrame {
         }
 
         String query = "SELECT * FROM users WHERE Username = ?";
-        try(Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword);
+        try(Connection con = DBConnection.Connect();
             PreparedStatement ps = con.prepareStatement(query)) {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
@@ -211,6 +220,18 @@ public class Login_Form extends javax.swing.JFrame {
             showErrorMessage("Database error: " + e.getMessage());
         }
     }//GEN-LAST:event_btnLoginActionPerformed
+
+    private void btnLoginKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnLoginKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {  
+            btnLoginActionPerformed(null);
+        }
+    }//GEN-LAST:event_btnLoginKeyPressed
+
+    private void txtPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPasswordKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {  
+            btnLoginActionPerformed(null);
+        }
+    }//GEN-LAST:event_txtPasswordKeyPressed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

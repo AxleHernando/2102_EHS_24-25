@@ -1,8 +1,8 @@
 package UI;
 
+import Databases.DBConnection;
 import javax.swing.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -141,9 +141,6 @@ public class SignUp_Form extends javax.swing.JFrame {
         String username = txtUsername.getText();
         String password = new String(txtPassword.getPassword());
         String role = (String) comboRole.getSelectedItem();
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_EHS_2425";
-        String dbUser    = "root";
-        String dbPassword = "";
 
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -152,7 +149,7 @@ public class SignUp_Form extends javax.swing.JFrame {
 
         String insertUserQuery = "INSERT INTO users (Username, Password, Role) VALUES (?, ?, ?)";
 
-        try (Connection con = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+        try (Connection con = DBConnection.Connect();
             PreparedStatement ps = con.prepareStatement(insertUserQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, username);
             ps.setString(2, password);

@@ -1,10 +1,9 @@
 package UI;
 
-import Users.UserSession;
+import Databases.DBConnection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.NumberFormat;
@@ -39,10 +38,6 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     }
     
     private void loadProducts() {
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
-        String dbUser    = "root";
-        String dbPassword = "";
-
         productTableModel = new DefaultTableModel(new String[]{"ID", "Name", "Price", "Stocks"}, 0);
         Table_Products.setModel(productTableModel);
 
@@ -50,7 +45,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
 
         System.out.println(loggedInUserId);
 
-        try (Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword)) {
+        try (Connection con = DBConnection.Connect()) {
             String query = "SELECT p.ProductID, p.Name, p.Price, p.Stocks FROM products p JOIN users u ON p.UserID = u.UserID WHERE u.UserID = ?";
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 ps.setString(1, loggedInUserId);
@@ -83,11 +78,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     }
     
     private void updateProductDetails(String productId) {
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
-        String dbUser  = "root";
-        String dbPassword = "";
-
-        try (Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword)) {
+        try (Connection con = DBConnection.Connect()) {
             String query = "SELECT Name, Description, UserID, Stocks FROM products WHERE ProductID = ?";
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 ps.setString(1, productId);
@@ -230,9 +221,9 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         });
 
         btnBack.setBackground(new java.awt.Color(153, 153, 255));
-        btnBack.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+        btnBack.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
         btnBack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/back.png"))); // NOI18N
-        btnBack.setText("Go Back");
+        btnBack.setText("Log Out");
         btnBack.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnBack.setMargin(new java.awt.Insets(2, 0, 3, 0));
         btnBack.addActionListener(new java.awt.event.ActionListener() {
@@ -329,7 +320,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
         Login_Form login = Login_Form.getInstance();
         login.setVisible(true);
-        this.setVisible(false);
+        this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnEditProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditProductActionPerformed
@@ -337,23 +328,43 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEditProductActionPerformed
 
     private void btnAddProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddProductActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_btnAddProductActionPerformed
 
     private void btnRemoveProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveProductActionPerformed
-        int selectedRow = Table_Products.getSelectedRow(); 
-    
+        int selectedRow = Table_Products.getSelectedRow();
+
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(null, "Please select a product to remove from the cart.", "Error", JOptionPane.ERROR_MESSAGE);
-            return; 
+            return;
         }
 
         productTableModel = (DefaultTableModel) Table_Products.getModel();
+        String productId = Table_Products.getValueAt(selectedRow, 0).toString();
+
         productTableModel.removeRow(selectedRow);
+        
+        try (Connection con = DBConnection.Connect()) {
+            String removeQuery = "DELETE FROM products WHERE ProductID = ?";
+            try (PreparedStatement ps = con.prepareStatement(removeQuery)) {
+                ps.setString(1, productId);
+
+                int rowsAffected = ps.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(null, "Product removed successfully!", "Removed", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Product not found in database.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error removing product details: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "An error occurred while removing the product.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnRemoveProductActionPerformed
 
     private void btnViewSalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewSalesActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_btnViewSalesActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 21, 2024 at 10:36 AM
+-- Generation Time: Nov 22, 2024 at 02:46 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,24 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `2102_ehs_2425`
 --
-
--- --------------------------------------------------------
-
---
--- Table structure for table `admins`
---
-
-CREATE TABLE `admins` (
-  `AdminID` int(11) NOT NULL,
-  `UserID` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `admins`
---
-
-INSERT INTO `admins` (`AdminID`, `UserID`) VALUES
-(3, 6);
 
 -- --------------------------------------------------------
 
@@ -59,20 +41,15 @@ CREATE TABLE `cardpayment` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `customers`
+-- Table structure for table `cashpayment`
 --
 
-CREATE TABLE `customers` (
-  `CustomerID` int(11) NOT NULL,
-  `UserID` int(11) DEFAULT NULL
+CREATE TABLE `cashpayment` (
+  `CashID` int(11) NOT NULL,
+  `UserID` int(11) DEFAULT NULL,
+  `CashTendered` decimal(10,2) DEFAULT NULL,
+  `TransactionDate` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `customers`
---
-
-INSERT INTO `customers` (`CustomerID`, `UserID`) VALUES
-(3, 7);
 
 -- --------------------------------------------------------
 
@@ -102,37 +79,43 @@ CREATE TABLE `products` (
   `Name` varchar(255) DEFAULT NULL,
   `Description` varchar(255) DEFAULT NULL,
   `Price` decimal(10,2) DEFAULT NULL,
-  `SupplierID` int(11) DEFAULT NULL
+  `UserID` int(11) DEFAULT NULL,
+  `Stocks` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`ProductID`, `Name`, `Description`, `Price`, `SupplierID`) VALUES
-(1, 'Laptop', 'High-End Gaming Laptop for Gamers', 50000.00, 8),
-(2, 'iPhone', 'Newly Launched High-End Mobile Phone', 40000.00, 8),
-(3, 'PlayStation 5', 'Next-Gen Gaming Console', 30000.00, 8),
-(4, 'Nintendo Switch', 'A Versatile Gaming Console', 20000.00, 8),
-(5, 'AirPods', 'Noise-Cancelling Earbuds', 15000.00, 8);
+INSERT INTO `products` (`ProductID`, `Name`, `Description`, `Price`, `UserID`, `Stocks`) VALUES
+(1, 'Laptop', 'High-End Gaming Laptop for Gamers', 50000.00, 6, 10),
+(2, 'iPhone', 'Newly Launched High-End Mobile Phone', 40000.00, 6, 10),
+(3, 'PlayStation 5', 'Next-Gen Gaming Console', 30000.00, 6, 10),
+(4, 'Nintendo Switch', 'A Versatile Gaming Console', 20000.00, 6, 10);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `suppliers`
+-- Table structure for table `sales`
 --
 
-CREATE TABLE `suppliers` (
-  `SupplierID` int(11) NOT NULL,
+CREATE TABLE `sales` (
+  `SalesID` int(11) NOT NULL,
+  `TotalEarnings` decimal(10,2) DEFAULT NULL,
+  `SaleDate` datetime DEFAULT current_timestamp(),
   `UserID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `suppliers`
+-- Table structure for table `salesorders`
 --
 
-INSERT INTO `suppliers` (`SupplierID`, `UserID`) VALUES
-(3, 8);
+CREATE TABLE `salesorders` (
+  `SalesID` int(11) NOT NULL,
+  `OrderID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -154,19 +137,11 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`UserID`, `Username`, `Password`, `Role`, `CreatedAt`) VALUES
 (6, 'Admin', 'admin123', 'Admin', '2024-11-20 10:53:58'),
-(7, 'Customer', 'cust123', 'Customer', '2024-11-20 10:56:36'),
-(8, 'Supplier', 'supp123', 'Supplier', '2024-11-20 10:57:37');
+(7, 'Customer', 'cust123', 'Customer', '2024-11-20 10:56:36');
 
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `admins`
---
-ALTER TABLE `admins`
-  ADD PRIMARY KEY (`AdminID`),
-  ADD KEY `UserID` (`UserID`);
 
 --
 -- Indexes for table `cardpayment`
@@ -176,10 +151,11 @@ ALTER TABLE `cardpayment`
   ADD KEY `UserID` (`UserID`);
 
 --
--- Indexes for table `customers`
+-- Indexes for table `cashpayment`
 --
-ALTER TABLE `customers`
-  ADD PRIMARY KEY (`CustomerID`);
+ALTER TABLE `cashpayment`
+  ADD PRIMARY KEY (`CashID`),
+  ADD KEY `UserID` (`UserID`);
 
 --
 -- Indexes for table `orders`
@@ -194,14 +170,21 @@ ALTER TABLE `orders`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`ProductID`),
-  ADD KEY `SupplierID` (`SupplierID`);
+  ADD KEY `SupplierID` (`UserID`);
 
 --
--- Indexes for table `suppliers`
+-- Indexes for table `sales`
 --
-ALTER TABLE `suppliers`
-  ADD PRIMARY KEY (`SupplierID`),
+ALTER TABLE `sales`
+  ADD PRIMARY KEY (`SalesID`),
   ADD KEY `UserID` (`UserID`);
+
+--
+-- Indexes for table `salesorders`
+--
+ALTER TABLE `salesorders`
+  ADD PRIMARY KEY (`SalesID`,`OrderID`),
+  ADD KEY `OrderID` (`OrderID`);
 
 --
 -- Indexes for table `users`
@@ -214,28 +197,22 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `admins`
---
-ALTER TABLE `admins`
-  MODIFY `AdminID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
 -- AUTO_INCREMENT for table `cardpayment`
 --
 ALTER TABLE `cardpayment`
-  MODIFY `CardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `CardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
--- AUTO_INCREMENT for table `customers`
+-- AUTO_INCREMENT for table `cashpayment`
 --
-ALTER TABLE `customers`
-  MODIFY `CustomerID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `cashpayment`
+  MODIFY `CashID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `OrderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `OrderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -244,10 +221,10 @@ ALTER TABLE `products`
   MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT for table `suppliers`
+-- AUTO_INCREMENT for table `sales`
 --
-ALTER TABLE `suppliers`
-  MODIFY `SupplierID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `sales`
+  MODIFY `SalesID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -260,16 +237,16 @@ ALTER TABLE `users`
 --
 
 --
--- Constraints for table `admins`
---
-ALTER TABLE `admins`
-  ADD CONSTRAINT `admins_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
-
---
 -- Constraints for table `cardpayment`
 --
 ALTER TABLE `cardpayment`
   ADD CONSTRAINT `cardpayment_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
+
+--
+-- Constraints for table `cashpayment`
+--
+ALTER TABLE `cashpayment`
+  ADD CONSTRAINT `cashpayment_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
 
 --
 -- Constraints for table `orders`
@@ -282,13 +259,20 @@ ALTER TABLE `orders`
 -- Constraints for table `products`
 --
 ALTER TABLE `products`
-  ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`SupplierID`) REFERENCES `users` (`UserID`);
+  ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
 
 --
--- Constraints for table `suppliers`
+-- Constraints for table `sales`
 --
-ALTER TABLE `suppliers`
-  ADD CONSTRAINT `suppliers_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
+ALTER TABLE `sales`
+  ADD CONSTRAINT `sales_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
+
+--
+-- Constraints for table `salesorders`
+--
+ALTER TABLE `salesorders`
+  ADD CONSTRAINT `salesorders_ibfk_1` FOREIGN KEY (`SalesID`) REFERENCES `sales` (`SalesID`),
+  ADD CONSTRAINT `salesorders_ibfk_2` FOREIGN KEY (`OrderID`) REFERENCES `orders` (`OrderID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

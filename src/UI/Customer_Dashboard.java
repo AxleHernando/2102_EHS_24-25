@@ -1,13 +1,11 @@
 package UI;
 
+import Databases.DBConnection;
 import javax.swing.*;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.util.Locale;
 import javax.swing.table.DefaultTableModel;
@@ -18,19 +16,14 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     public Customer_Dashboard() {
         initComponents();
         loadProducts();
-        addTableMouseListener();
     }
 
     private void loadProducts() {
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
-        String dbUser  = "root";
-        String dbPassword = "";
-
         productTableModel = new DefaultTableModel(new String[]{"ID", "Name", "Price", "Seller"}, 0);
         Table_Products.setModel(productTableModel);
 
-        try (Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword)) {
-            String query = "SELECT p.ProductID, p.Name, p.Price, u.Username FROM products p JOIN users u ON p.UserID = u.UserID WHERE u.Role = 'Supplier'";
+        try (Connection con = DBConnection.Connect()) {
+            String query = "SELECT p.ProductID, p.Name, p.Price, u.Username FROM products p JOIN users u ON p.UserID = u.UserID WHERE u.Role = 'Admin'";
             try (PreparedStatement ps = con.prepareStatement(query);
                  ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -58,24 +51,9 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         }
     }
 
-    private void addTableMouseListener() {
-        Table_Products.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent evt) {
-                int row = Table_Products.getSelectedRow();
-                if (row != -1) {
-                    String productId = Table_Products.getValueAt(row, 0).toString();
-                    updateProductDetails(productId);
-                }
-            }
-        });
-    }
-
     private void updateProductDetails(String productId) {
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
-        String dbUser  = "root";
-        String dbPassword = "";
 
-        try (Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword)) {
+        try (Connection con = DBConnection.Connect()) {
             String query = "SELECT Name, Description, UserID FROM products WHERE ProductID = ?";
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 ps.setString(1, productId);
@@ -99,11 +77,8 @@ public class Customer_Dashboard extends javax.swing.JFrame {
 
     private String getSupplierName(String userId) {
         String supplierName = "";
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
-        String dbUser  = "root";
-        String dbPassword = "";
 
-        try (Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword)) {
+        try (Connection con = DBConnection.Connect()) {
             String query = "SELECT Username FROM users WHERE UserID = ?";
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 ps.setString(1, userId);
@@ -154,12 +129,8 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         }
     }
     
-    private void insertOrderIntoDatabase(String userID, String modeOfPayment, String cardNumber, String cardHolder, String expiryDate, String cvc) {
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425"; 
-        String dbUser    = "root"; 
-        String dbPassword = ""; 
-
-        try (Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword)) {
+    private void insertOrderIntoDatabase(String userID, String modeOfPayment) {
+        try (Connection con = DBConnection.Connect()) {
             String insertOrderQuery = "INSERT INTO orders (UserID, ProductID, Quantity, Price, Status, ModeOfPayment) VALUES (?, ?, ?, ?, ?, ?)";
 
             for (int i = 0; i < cartTableModel.getRowCount(); i++) {
@@ -190,11 +161,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     }
     
     private void insertCashIntoDatabase(String userID, String cashTendered) {
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425"; 
-        String dbUser    = "root"; 
-        String dbPassword = ""; 
-        
-        try (Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword)) {
+        try (Connection con = DBConnection.Connect()) {
             String insertCashQuery = "INSERT INTO cashPayment (UserID, CashTendered) VALUES (?, ?)";
             
             try (PreparedStatement ps = con.prepareStatement(insertCashQuery)) {
@@ -309,6 +276,11 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                 "ID", "Name", "Price", "Seller"
             }
         ));
+        Table_Products.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Table_ProductsMouseClicked(evt);
+            }
+        });
         jScrollPane3.setViewportView(Table_Products);
 
         lblProductDesc.setColumns(20);
@@ -392,7 +364,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         btnBack.setBackground(new java.awt.Color(153, 153, 255));
         btnBack.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
         btnBack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/back.png"))); // NOI18N
-        btnBack.setText("Go Back");
+        btnBack.setText("Log Out");
         btnBack.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnBack.setMargin(new java.awt.Insets(2, 0, 3, 0));
         btnBack.addActionListener(new java.awt.event.ActionListener() {
@@ -541,15 +513,15 @@ public class Customer_Dashboard extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Your shopping cart is empty. Please add products before checking out.", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
+        
         double total = 0.0;
         for (int i = 0; i < cartTableModel.getRowCount(); i++) {
-            String priceString = cartTableModel.getValueAt(i, 3).toString(); 
+            String priceString = cartTableModel.getValueAt(i, 3).toString();
             double price = Double.parseDouble(priceString.replace("PHP ", "").replace(",", "").trim());
             int quantity = (int) cartTableModel.getValueAt(i, 2);
             total += price * quantity;
         }
-
+        
         if ("Card Payment".equals(modeOfPayment)) {
             CardPayment cardPayment = new CardPayment(total);
             cardPayment.setVisible(true);
@@ -562,19 +534,34 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     String expiryDate = cardPayment.getExpiryDate();
                     String cvc = cardPayment.getCVC();
 
-                    insertOrderIntoDatabase(loggedInUserID, modeOfPayment, cardNumber, cardHolder, expiryDate, cvc);
+                    insertOrderIntoDatabase(loggedInUserID, modeOfPayment);
                 }
             });
         } else {
-            insertOrderIntoDatabase(loggedInUserID, modeOfPayment, null, null, null, null);
+            insertOrderIntoDatabase(loggedInUserID, modeOfPayment);
             insertCashIntoDatabase(loggedInUserID, String.valueOf(total));
+            
+            String message = "Do you want to proceed with checkout?";
+
+            int confirm = JOptionPane.showConfirmDialog(this, message,
+                    "Confirm Checkout", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                for (int i = 0; i < cartTableModel.getRowCount(); i++) {
+                    String priceString = cartTableModel.getValueAt(i, 3).toString();
+                    double price = Double.parseDouble(priceString.replace("PHP ", "").replace(",", "").trim());
+                    int quantity = (int) cartTableModel.getValueAt(i, 2);
+                    total += price * quantity;
+                }
+            }
         }
     }//GEN-LAST:event_btnCheckOutActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
         Login_Form login = Login_Form.getInstance();
         login.setVisible(true);
-        this.setVisible(false);
+        this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnAddToCartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddToCartActionPerformed
@@ -656,6 +643,14 @@ public class Customer_Dashboard extends javax.swing.JFrame {
 
         updateTotal();
     }//GEN-LAST:event_btnRemoveProductActionPerformed
+
+    private void Table_ProductsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Table_ProductsMouseClicked
+        int row = Table_Products.getSelectedRow();
+            if (row != -1) {
+                String productId = Table_Products.getValueAt(row, 0).toString();
+                updateProductDetails(productId);
+            }
+    }//GEN-LAST:event_Table_ProductsMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MainPanel;
