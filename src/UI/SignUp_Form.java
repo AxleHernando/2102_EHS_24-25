@@ -58,7 +58,7 @@ public class SignUp_Form extends javax.swing.JFrame {
 
         txtUsername.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
-        comboRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Admin", "Customer", "Supplier" }));
+        comboRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Admin", "Customer" }));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -151,9 +151,6 @@ public class SignUp_Form extends javax.swing.JFrame {
         }
 
         String insertUserQuery = "INSERT INTO users (Username, Password, Role) VALUES (?, ?, ?)";
-        String insertAdminQuery = "INSERT INTO admins (UserID) VALUES (?)";
-        String insertCustomerQuery = "INSERT INTO customers (UserID) VALUES (?)";
-        String insertSupplierQuery = "INSERT INTO suppliers (UserID) VALUES (?)";
 
         try (Connection con = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
             PreparedStatement ps = con.prepareStatement(insertUserQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -162,29 +159,8 @@ public class SignUp_Form extends javax.swing.JFrame {
             ps.setString(3, role);
             ps.executeUpdate();
 
-            // Retrieve the generated UserID
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
-                int userId = generatedKeys.getInt(1); // Get the generated UserID
-
-                // Insert into the respective role table
-                if (role.equals("Admin")) {
-                    try (PreparedStatement adminPs = con.prepareStatement(insertAdminQuery)) {
-                        adminPs.setInt(1, userId);
-                        adminPs.executeUpdate();
-                    }
-                } else if (role.equals("Customer")) {
-                    try (PreparedStatement customerPs = con.prepareStatement(insertCustomerQuery)) {
-                        customerPs.setInt(1, userId);
-                        customerPs.executeUpdate();
-                    }
-                } else if (role.equals("Supplier")) {
-                    try (PreparedStatement supplierPs = con.prepareStatement(insertSupplierQuery)) {
-                        supplierPs.setInt(1, userId);
-                        supplierPs.executeUpdate();
-                    }
-                }
-
                 JOptionPane.showMessageDialog(this, "User  registered successfully!");
                 this.dispose();
                 Login_Form login = Login_Form.getInstance();

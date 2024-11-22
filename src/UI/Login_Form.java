@@ -193,13 +193,7 @@ public class Login_Form extends javax.swing.JFrame {
                             this.dispose();
                             break;
                         case "Admin":
-                            Admin_Dashboard adminDashboard = new Admin_Dashboard();
-                            adminDashboard.setVisible(true);
-                            resetFields();
-                            this.dispose();
-                            break;
-                        case "Supplier":
-                            Supplier_Dashboard supplierDashboard = new Supplier_Dashboard();
+                            Admin_Dashboard supplierDashboard = new Admin_Dashboard();
                             supplierDashboard.setVisible(true);
                             resetFields();
                             this.dispose();

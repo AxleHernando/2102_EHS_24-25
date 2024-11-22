@@ -38,12 +38,10 @@ public class CardPayment extends javax.swing.JFrame {
         lblWelcome5 = new javax.swing.JLabel();
         txtExpiry = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
         btnProceed.setBackground(new java.awt.Color(153, 153, 255));
-        btnProceed.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
+        btnProceed.setFont(new java.awt.Font("Helvetica", 1, 18)); // NOI18N
         btnProceed.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Payment.png"))); // NOI18N
-        btnProceed.setText("Proceed to Payment");
+        btnProceed.setText("Place Order");
         btnProceed.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnProceed.setIconTextGap(10);
         btnProceed.setMargin(new java.awt.Insets(2, 0, 3, 0));
@@ -231,7 +229,6 @@ public class CardPayment extends javax.swing.JFrame {
         return false;
     }
 
-    // Validate card input fields
     private boolean validateCardInput() {
         String cardNumber = getCardNumber();
         String cardHolder = getCardHolder();
@@ -261,7 +258,6 @@ public class CardPayment extends javax.swing.JFrame {
         return true;
     }
 
-    // Insert card details into the database
     private void insertCardDetailsToDatabase(String customerId, String cardNumber, String cvc, String cardHolder, String expiryDate, double paymentAmount) {
         String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
         String dbUser = "root";
