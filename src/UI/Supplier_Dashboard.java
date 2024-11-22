@@ -1,9 +1,111 @@
 package UI;
 
+import Users.UserSession;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.text.NumberFormat;
+import java.util.Locale;
+import javax.swing.ImageIcon;
+import javax.swing.table.DefaultTableModel;
+
 public class Supplier_Dashboard extends javax.swing.JFrame {
+    private DefaultTableModel productTableModel;
 
     public Supplier_Dashboard() {
         initComponents();
+        loadProducts();
+        addTableMouseListener();
+    }
+    
+    private void addTableMouseListener() {
+        Table_Products.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                int row = Table_Products.getSelectedRow();
+                if (row != -1) {
+                    String productId = Table_Products.getValueAt(row, 0).toString();
+                    updateProductDetails(productId);
+                }
+            }
+        });
+    }
+    
+    private String getLoggedInUserID() {
+        return Login_Form.loggedInUserID;
+    }
+    
+    private void loadProducts() {
+        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
+        String dbUser    = "root";
+        String dbPassword = "";
+
+        productTableModel = new DefaultTableModel(new String[]{"ID", "Name", "Price", "Stocks"}, 0);
+        Table_Products.setModel(productTableModel);
+
+        String loggedInUserId = getLoggedInUserID(); 
+
+        System.out.println(loggedInUserId);
+
+        try (Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword)) {
+            String query = "SELECT p.ProductID, p.Name, p.Price, p.Stocks FROM products p JOIN users u ON p.SupplierID = u.UserID WHERE u.UserID = ?";
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                ps.setString(1, loggedInUserId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String productId = rs.getString("ProductID");
+                        String name = rs.getString("Name");
+                        double price = rs.getDouble("Price");
+                        int stocks = rs.getInt("Stocks");
+
+                        if (name == null) {
+                            name = "N/A";
+                        }
+
+                        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
+                        String formattedPrice = formatter.format(price);
+
+                        productTableModel.addRow(new Object[]{productId, name, formattedPrice, stocks});
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error loading products: " + e.getMessage());
+        }
+    }
+    
+    private String getProductImage(String productId) {
+        String imagePath = "src/product_images/" + productId + ".jpg";
+        return imagePath;
+    }
+    
+    private void updateProductDetails(String productId) {
+        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
+        String dbUser  = "root";
+        String dbPassword = "";
+
+        try (Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword)) {
+            String query = "SELECT Name, Description, SupplierID, Stocks FROM products WHERE ProductID = ?";
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                ps.setString(1, productId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    String name = rs.getString("Name");
+                    String description = rs.getString("Description");
+                    String supplierId = rs.getString("SupplierID");
+                    String stocks = rs.getString("Stocks");
+
+                    lblProductName.setText(name);
+                    lblProductDesc.setText(description);
+                    lblProductImage.setIcon(new ImageIcon(getProductImage(productId))); 
+                    lblStocks.setText("Stocks: " + stocks);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error retrieving product details: " + e.getMessage());
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -12,14 +114,14 @@ public class Supplier_Dashboard extends javax.swing.JFrame {
 
         MainPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        Table_Role = new javax.swing.JTable();
+        Table_Products = new javax.swing.JTable();
         lblProducts = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         lblProductImage = new javax.swing.JLabel();
         lblProductName = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         lblProductDesc = new javax.swing.JTextArea();
-        lblSupplierName = new javax.swing.JLabel();
+        lblStocks = new javax.swing.JLabel();
         btnEditProduct = new javax.swing.JButton();
         btnAddProduct = new javax.swing.JButton();
         btnRemoveProduct = new javax.swing.JButton();
@@ -31,7 +133,7 @@ public class Supplier_Dashboard extends javax.swing.JFrame {
 
         MainPanel.setBackground(new java.awt.Color(248, 248, 248));
 
-        Table_Role.setModel(new javax.swing.table.DefaultTableModel(
+        Table_Products.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -42,7 +144,7 @@ public class Supplier_Dashboard extends javax.swing.JFrame {
                 "ID", "Name", "Price", "Stock"
             }
         ));
-        jScrollPane1.setViewportView(Table_Role);
+        jScrollPane1.setViewportView(Table_Products);
 
         lblProducts.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
         lblProducts.setText("Products");
@@ -59,8 +161,8 @@ public class Supplier_Dashboard extends javax.swing.JFrame {
         lblProductDesc.setWrapStyleWord(true);
         jScrollPane2.setViewportView(lblProductDesc);
 
-        lblSupplierName.setFont(new java.awt.Font("Helvetica", 1, 14)); // NOI18N
-        lblSupplierName.setText("...");
+        lblStocks.setFont(new java.awt.Font("Helvetica", 1, 14)); // NOI18N
+        lblStocks.setText("...");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -71,7 +173,7 @@ public class Supplier_Dashboard extends javax.swing.JFrame {
                 .addComponent(lblProductImage, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblSupplierName)
+                    .addComponent(lblStocks)
                     .addComponent(lblProductName)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -87,7 +189,7 @@ public class Supplier_Dashboard extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblSupplierName)
+                        .addComponent(lblStocks)
                         .addGap(46, 46, 46))
                     .addComponent(lblProductImage, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -226,7 +328,7 @@ public class Supplier_Dashboard extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MainPanel;
-    private javax.swing.JTable Table_Role;
+    private javax.swing.JTable Table_Products;
     private javax.swing.JButton btnAddProduct;
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnEditProduct;
@@ -238,6 +340,6 @@ public class Supplier_Dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel lblProductImage;
     private javax.swing.JLabel lblProductName;
     private javax.swing.JLabel lblProducts;
-    private javax.swing.JLabel lblSupplierName;
+    private javax.swing.JLabel lblStocks;
     // End of variables declaration//GEN-END:variables
 }

@@ -30,7 +30,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         Table_Products.setModel(productTableModel);
 
         try (Connection con = DriverManager.getConnection(dbUrl, dbUser , dbPassword)) {
-            String query = "SELECT p.ProductID, p.Name, p.Price, u.Username FROM products p JOIN users u ON p.SupplierID = u.UserID WHERE u.Role = 'Supplier'";
+            String query = "SELECT p.ProductID, p.Name, p.Price, u.Username FROM products p JOIN users u ON p.SupplierID = u.UserID WHERE u.UserID = 'Supplier'";
             try (PreparedStatement ps = con.prepareStatement(query);
                  ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
