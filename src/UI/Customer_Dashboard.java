@@ -538,9 +538,6 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                 }
             });
         } else {
-            insertOrderIntoDatabase(loggedInUserID, modeOfPayment);
-            insertCashIntoDatabase(loggedInUserID, String.valueOf(total));
-            
             String message = "Do you want to proceed with checkout?";
 
             int confirm = JOptionPane.showConfirmDialog(this, message,
@@ -555,6 +552,9 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     total += price * quantity;
                 }
             }
+            
+            insertOrderIntoDatabase(loggedInUserID, modeOfPayment);
+            insertCashIntoDatabase(loggedInUserID, String.valueOf(total));
         }
     }//GEN-LAST:event_btnCheckOutActionPerformed
 

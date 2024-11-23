@@ -18,19 +18,6 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     public Admin_Dashboard() {
         initComponents();
         loadProducts();
-        addTableMouseListener();
-    }
-    
-    private void addTableMouseListener() {
-        Table_Products.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent evt) {
-                int row = Table_Products.getSelectedRow();
-                if (row != -1) {
-                    String productId = Table_Products.getValueAt(row, 0).toString();
-                    updateProductDetails(productId);
-                }
-            }
-        });
     }
     
     private String getLoggedInUserID() {
@@ -38,12 +25,10 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     }
     
     private void loadProducts() {
-        productTableModel = new DefaultTableModel(new String[]{"ID", "Name", "Price", "Stocks"}, 0);
-        Table_Products.setModel(productTableModel);
+        DefaultTableModel model = (DefaultTableModel) Table_Products.getModel();
+        model.setRowCount(0);
 
-        String loggedInUserId = getLoggedInUserID(); 
-
-        System.out.println(loggedInUserId);
+        String loggedInUserId = getLoggedInUserID();
 
         try (Connection con = DBConnection.Connect()) {
             String query = "SELECT p.ProductID, p.Name, p.Price, p.Stocks FROM products p JOIN users u ON p.UserID = u.UserID WHERE u.UserID = ?";
@@ -63,13 +48,17 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                         NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
                         String formattedPrice = formatter.format(price);
 
-                        productTableModel.addRow(new Object[]{productId, name, formattedPrice, stocks});
+                        model.addRow(new Object[]{productId, name, formattedPrice, stocks});
                     }
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error loading products: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error loading products: " + e.getMessage());
         }
+    }
+    
+    public void refreshProducts() {
+        loadProducts();
     }
     
     private String getProductImage(String productId) {
@@ -120,7 +109,6 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         btnViewSales = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(675, 670));
         setResizable(false);
 
         MainPanel.setBackground(new java.awt.Color(248, 248, 248));
@@ -136,6 +124,11 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                 "ID", "Name", "Price", "Stock"
             }
         ));
+        Table_Products.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Table_ProductsMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(Table_Products);
 
         lblProducts.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
@@ -266,13 +259,10 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                                     .addGroup(MainPanelLayout.createSequentialGroup()
                                         .addComponent(lblProducts)
                                         .addGap(258, 258, 258)))
-                                .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(MainPanelLayout.createSequentialGroup()
-                                        .addGap(142, 142, 142)
-                                        .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MainPanelLayout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnViewSales, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addGap(132, 132, 132)
+                                .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnViewSales, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addComponent(jScrollPane1))
                         .addContainerGap())))
         );
@@ -324,48 +314,129 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnEditProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditProductActionPerformed
-        
+        Edit_Products editForm = new Edit_Products(this);
+        editForm.loadProductIDs();
+        editForm.setVisible(true);
     }//GEN-LAST:event_btnEditProductActionPerformed
 
     private void btnAddProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddProductActionPerformed
-        
+        new Add_Products(this).setVisible(true);
     }//GEN-LAST:event_btnAddProductActionPerformed
 
+    private void deleteProductImage(String productId) {
+        try {
+            // Construct the file path using the ProductID
+            java.io.File imageFile = new java.io.File("src/product_images/" + productId + ".jpg");
+            if (imageFile.exists()) {
+                if (imageFile.delete()) {
+                    JOptionPane.showMessageDialog(this, "Image file deleted successfully: " + imageFile.getAbsolutePath());
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to delete image file: " + imageFile.getAbsolutePath());
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "No image file found for ProductID: " + productId);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error deleting image file: " + e.getMessage());
+        }
+    }
+    
     private void btnRemoveProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveProductActionPerformed
         int selectedRow = Table_Products.getSelectedRow();
 
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(null, "Please select a product to remove from the cart.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Please select a product to remove.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         productTableModel = (DefaultTableModel) Table_Products.getModel();
         String productId = Table_Products.getValueAt(selectedRow, 0).toString();
 
-        productTableModel.removeRow(selectedRow);
-        
-        try (Connection con = DBConnection.Connect()) {
-            String removeQuery = "DELETE FROM products WHERE ProductID = ?";
-            try (PreparedStatement ps = con.prepareStatement(removeQuery)) {
-                ps.setString(1, productId);
+        String message = "Name: " + lblProductName.getText() + "\n"
+                + "Description: " + lblProductDesc.getText() + "\n"
+                + "Price: " + Table_Products.getValueAt(selectedRow, 2).toString() + "\n"
+                + "Stocks: " + Table_Products.getValueAt(selectedRow, 3).toString() + "\n"
+                + "Do you want to proceed?";
 
-                int rowsAffected = ps.executeUpdate();
+        int confirm = JOptionPane.showConfirmDialog(this, message,
+                "Confirm Delete", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
 
-                if (rowsAffected > 0) {
-                    JOptionPane.showMessageDialog(null, "Product removed successfully!", "Removed", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Product not found in database.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (confirm == JOptionPane.YES_OPTION) {
+            try (Connection con = DBConnection.Connect()) {
+                // Delete the product from the database
+                String removeQuery = "DELETE FROM products WHERE ProductID = ?";
+                try (PreparedStatement ps = con.prepareStatement(removeQuery)) {
+                    ps.setString(1, productId);
+
+                    int rowsAffected = ps.executeUpdate();
+
+                    if (rowsAffected > 0) {
+                        // Delete the associated product image
+                        String imagePath = getProductImage(productId);
+                        java.io.File imageFile = new java.io.File(imagePath);
+                        if (imageFile.exists() && imageFile.isFile()) {
+                            if (imageFile.delete()) {
+                                System.out.println("Image file deleted: " + imagePath);
+                            } else {
+                                System.out.println("Failed to delete image file: " + imagePath);
+                            }
+                        } else {
+                            System.out.println("Image file not found: " + imagePath);
+                        }
+
+                        JOptionPane.showMessageDialog(null, "Product removed successfully!", "Removed", JOptionPane.INFORMATION_MESSAGE);
+                        productTableModel.removeRow(selectedRow); // Remove the product from the table
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Product not found in the database.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
+            } catch (Exception e) {
+                System.out.println("Error removing product: " + e.getMessage());
+                JOptionPane.showMessageDialog(null, "An error occurred while removing the product.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (Exception e) {
-            System.out.println("Error removing product details: " + e.getMessage());
-            JOptionPane.showMessageDialog(null, "An error occurred while removing the product.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnRemoveProductActionPerformed
 
     private void btnViewSalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewSalesActionPerformed
+        String loggedInUserId = getLoggedInUserID();
         
+        try (Connection con = DBConnection.Connect()) {
+            String query = "SELECT s.SaleID, p.Name, s.Quantity, s.TotalPrice, s.SaleDate "
+                    + "FROM sales s "
+                    + "JOIN products p ON s.ProductID = p.ProductID "
+                    + "WHERE p.UserID = ?";
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                ps.setString(1, loggedInUserId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String saleId = rs.getString("SaleID");
+                        String productName = rs.getString("Name");
+                        int quantity = rs.getInt("Quantity");
+                        double totalPrice = rs.getDouble("TotalPrice");
+                        String saleDate = rs.getString("SaleDate");
+
+                        salesModel.addRow(new Object[]{saleId, productName, quantity, totalPrice, saleDate});
+                    }
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading sales: " + e.getMessage());
+        }
+
+        // Add the table to a JScrollPane and display it
+        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(salesTable);
+        salesFrame.add(scrollPane);
+        salesFrame.setVisible(true);
     }//GEN-LAST:event_btnViewSalesActionPerformed
+
+    private void Table_ProductsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Table_ProductsMouseClicked
+        int row = Table_Products.getSelectedRow();
+        if (row != -1) {
+            String productId = Table_Products.getValueAt(row, 0).toString();
+            updateProductDetails(productId);
+        }
+    }//GEN-LAST:event_Table_ProductsMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MainPanel;

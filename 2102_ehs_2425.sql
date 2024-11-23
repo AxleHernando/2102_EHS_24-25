@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 22, 2024 at 02:46 PM
+-- Generation Time: Nov 23, 2024 at 06:29 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -91,7 +91,8 @@ INSERT INTO `products` (`ProductID`, `Name`, `Description`, `Price`, `UserID`, `
 (1, 'Laptop', 'High-End Gaming Laptop for Gamers', 50000.00, 6, 10),
 (2, 'iPhone', 'Newly Launched High-End Mobile Phone', 40000.00, 6, 10),
 (3, 'PlayStation 5', 'Next-Gen Gaming Console', 30000.00, 6, 10),
-(4, 'Nintendo Switch', 'A Versatile Gaming Console', 20000.00, 6, 10);
+(4, 'Nintendo Switch', 'A Versatile Gaming Console', 20000.00, 6, 10),
+(6, 'AirPods', 'Wireless Bluetooth EarBuds designed by Apple', 15000.00, 6, 10);
 
 -- --------------------------------------------------------
 
@@ -218,7 +219,7 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `sales`
