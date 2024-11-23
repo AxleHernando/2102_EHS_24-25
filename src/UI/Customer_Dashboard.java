@@ -130,7 +130,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     
     private void insertOrderIntoDatabase(String userID, String modeOfPayment) {
         try (Connection con = DBConnection.Connect()) {
-            String insertOrderQuery = "INSERT INTO orders (UserID, ProductID, Quantity, Price, Status, ModeOfPayment) VALUES (?, ?, ?, ?, ?, ?)";
+            String insertOrderQuery = "INSERT INTO orders (UserID, ProductID, Quantity, Price, ModeOfPayment) VALUES (?, ?, ?, ?, ?)";
             String insertSalesQuery = "INSERT INTO sales (UserID, ProductID, Quantity, TotalPrice, SaleDate) VALUES (?, ?, ?, ?, NOW())";
 
             for (int i = 0; i < cartTableModel.getRowCount(); i++) {
@@ -138,15 +138,13 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                 int quantity = (int) cartTableModel.getValueAt(i, 2);
                 String priceString = cartTableModel.getValueAt(i, 3).toString();
                 double price = quantity * Double.parseDouble(priceString.replace("PHP ", "").replace(",", "").trim());
-                String status = "Pending";
 
                 try (PreparedStatement ps = con.prepareStatement(insertOrderQuery)) {
                     ps.setString(1, userID);
                     ps.setString(2, productId);
                     ps.setInt(3, quantity);
                     ps.setDouble(4, price);
-                    ps.setString(5, status);
-                    ps.setString(6, modeOfPayment);
+                    ps.setString(5, modeOfPayment);
                     ps.executeUpdate();
                 }
 

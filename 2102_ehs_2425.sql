@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2024 at 06:29 AM
+-- Generation Time: Nov 23, 2024 at 08:13 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -51,6 +51,17 @@ CREATE TABLE `cashpayment` (
   `TransactionDate` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `cashpayment`
+--
+
+INSERT INTO `cashpayment` (`CashID`, `UserID`, `CashTendered`, `TransactionDate`) VALUES
+(6, 7, 80000.00, '2024-11-23 14:09:07'),
+(7, 9, 100000.00, '2024-11-23 14:13:18'),
+(8, 7, 30000.00, '2024-11-23 14:45:16'),
+(9, 9, 30000.00, '2024-11-23 14:45:29'),
+(10, 10, 240000.00, '2024-11-23 15:08:21');
+
 -- --------------------------------------------------------
 
 --
@@ -64,9 +75,22 @@ CREATE TABLE `orders` (
   `Quantity` int(11) NOT NULL,
   `OrderDate` timestamp NOT NULL DEFAULT current_timestamp(),
   `Price` decimal(10,2) NOT NULL,
-  `Status` varchar(100) DEFAULT NULL,
   `ModeOfPayment` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`OrderID`, `UserID`, `ProductID`, `Quantity`, `OrderDate`, `Price`, `ModeOfPayment`) VALUES
+(33, 7, 2, 1, '2024-11-23 06:08:25', 40000.00, 'Cash On Delivery'),
+(34, 7, 2, 1, '2024-11-23 06:09:06', 40000.00, 'Cash On Delivery'),
+(35, 9, 4, 1, '2024-11-23 06:13:17', 20000.00, 'Cash On Delivery'),
+(36, 9, 6, 2, '2024-11-23 06:13:17', 30000.00, 'Cash On Delivery'),
+(37, 7, 6, 1, '2024-11-23 06:45:15', 15000.00, 'Cash On Delivery'),
+(38, 9, 6, 1, '2024-11-23 06:45:28', 15000.00, 'Cash On Delivery'),
+(39, 10, 6, 2, '2024-11-23 07:08:20', 30000.00, 'Cash On Delivery'),
+(40, 10, 3, 3, '2024-11-23 07:08:20', 90000.00, 'Cash On Delivery');
 
 -- --------------------------------------------------------
 
@@ -101,22 +125,26 @@ INSERT INTO `products` (`ProductID`, `Name`, `Description`, `Price`, `UserID`, `
 --
 
 CREATE TABLE `sales` (
-  `SalesID` int(11) NOT NULL,
-  `TotalEarnings` decimal(10,2) DEFAULT NULL,
-  `SaleDate` datetime DEFAULT current_timestamp(),
-  `UserID` int(11) DEFAULT NULL
+  `SaleID` int(11) NOT NULL,
+  `ProductID` int(11) NOT NULL,
+  `Quantity` int(11) NOT NULL,
+  `TotalPrice` decimal(10,2) NOT NULL,
+  `SaleDate` datetime NOT NULL,
+  `UserID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `salesorders`
+-- Dumping data for table `sales`
 --
 
-CREATE TABLE `salesorders` (
-  `SalesID` int(11) NOT NULL,
-  `OrderID` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO `sales` (`SaleID`, `ProductID`, `Quantity`, `TotalPrice`, `SaleDate`, `UserID`) VALUES
+(1, 2, 1, 40000.00, '2024-11-23 14:09:06', 7),
+(2, 4, 1, 20000.00, '2024-11-23 14:13:17', 9),
+(3, 6, 2, 30000.00, '2024-11-23 14:13:17', 9),
+(4, 6, 1, 15000.00, '2024-11-23 14:45:15', 7),
+(5, 6, 1, 15000.00, '2024-11-23 14:45:28', 9),
+(6, 6, 2, 30000.00, '2024-11-23 15:08:20', 10),
+(7, 3, 3, 90000.00, '2024-11-23 15:08:20', 10);
 
 -- --------------------------------------------------------
 
@@ -129,16 +157,19 @@ CREATE TABLE `users` (
   `Username` varchar(100) DEFAULT NULL,
   `Password` varchar(100) DEFAULT NULL,
   `Role` varchar(100) DEFAULT NULL,
-  `CreatedAt` timestamp NOT NULL DEFAULT current_timestamp()
+  `CreatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `FullName` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`UserID`, `Username`, `Password`, `Role`, `CreatedAt`) VALUES
-(6, 'Admin', 'admin123', 'Admin', '2024-11-20 10:53:58'),
-(7, 'Customer', 'cust123', 'Customer', '2024-11-20 10:56:36');
+INSERT INTO `users` (`UserID`, `Username`, `Password`, `Role`, `CreatedAt`, `FullName`) VALUES
+(6, 'linuxadona', 'admin123', 'Admin', '2024-11-20 10:53:58', 'Linux Mandrake Adona'),
+(7, 'axlehernando', 'cust123', 'Customer', '2024-11-20 10:56:36', 'Axle Hernando'),
+(9, 'kayemacalalad', '12345678', 'Customer', '2024-11-23 06:13:03', 'Kaye Macalalad'),
+(10, 'kristinegandaa', 'kristine03', 'Customer', '2024-11-23 07:07:32', 'kristine de torres');
 
 --
 -- Indexes for dumped tables
@@ -177,15 +208,9 @@ ALTER TABLE `products`
 -- Indexes for table `sales`
 --
 ALTER TABLE `sales`
-  ADD PRIMARY KEY (`SalesID`),
+  ADD PRIMARY KEY (`SaleID`),
+  ADD KEY `ProductID` (`ProductID`),
   ADD KEY `UserID` (`UserID`);
-
---
--- Indexes for table `salesorders`
---
-ALTER TABLE `salesorders`
-  ADD PRIMARY KEY (`SalesID`,`OrderID`),
-  ADD KEY `OrderID` (`OrderID`);
 
 --
 -- Indexes for table `users`
@@ -201,19 +226,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cardpayment`
 --
 ALTER TABLE `cardpayment`
-  MODIFY `CardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `CardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `cashpayment`
 --
 ALTER TABLE `cashpayment`
-  MODIFY `CashID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `CashID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `OrderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `OrderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -225,13 +250,13 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `sales`
 --
 ALTER TABLE `sales`
-  MODIFY `SalesID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `SaleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
@@ -266,14 +291,8 @@ ALTER TABLE `products`
 -- Constraints for table `sales`
 --
 ALTER TABLE `sales`
-  ADD CONSTRAINT `sales_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
-
---
--- Constraints for table `salesorders`
---
-ALTER TABLE `salesorders`
-  ADD CONSTRAINT `salesorders_ibfk_1` FOREIGN KEY (`SalesID`) REFERENCES `sales` (`SalesID`),
-  ADD CONSTRAINT `salesorders_ibfk_2` FOREIGN KEY (`OrderID`) REFERENCES `orders` (`OrderID`);
+  ADD CONSTRAINT `sales_ibfk_1` FOREIGN KEY (`ProductID`) REFERENCES `products` (`ProductID`),
+  ADD CONSTRAINT `sales_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
