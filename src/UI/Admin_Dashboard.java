@@ -326,7 +326,6 @@ public class Admin_Dashboard extends javax.swing.JFrame {
 
     private void deleteProductImage(String productId) {
         try {
-            // Construct the file path using the ProductID
             java.io.File imageFile = new java.io.File("src/product_images/" + productId + ".jpg");
             if (imageFile.exists()) {
                 if (imageFile.delete()) {
@@ -365,7 +364,6 @@ public class Admin_Dashboard extends javax.swing.JFrame {
 
         if (confirm == JOptionPane.YES_OPTION) {
             try (Connection con = DBConnection.Connect()) {
-                // Delete the product from the database
                 String removeQuery = "DELETE FROM products WHERE ProductID = ?";
                 try (PreparedStatement ps = con.prepareStatement(removeQuery)) {
                     ps.setString(1, productId);
@@ -373,7 +371,6 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                     int rowsAffected = ps.executeUpdate();
 
                     if (rowsAffected > 0) {
-                        // Delete the associated product image
                         String imagePath = getProductImage(productId);
                         java.io.File imageFile = new java.io.File(imagePath);
                         if (imageFile.exists() && imageFile.isFile()) {
@@ -387,7 +384,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                         }
 
                         JOptionPane.showMessageDialog(null, "Product removed successfully!", "Removed", JOptionPane.INFORMATION_MESSAGE);
-                        productTableModel.removeRow(selectedRow); // Remove the product from the table
+                        productTableModel.removeRow(selectedRow);
                     } else {
                         JOptionPane.showMessageDialog(null, "Product not found in the database.", "Error", JOptionPane.ERROR_MESSAGE);
                     }

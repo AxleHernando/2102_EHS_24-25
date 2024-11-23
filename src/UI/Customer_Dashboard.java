@@ -23,27 +23,27 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         Table_Products.setModel(productTableModel);
 
         try (Connection con = DBConnection.Connect()) {
-            String query = "SELECT p.ProductID, p.Name, p.Price, u.Username FROM products p JOIN users u ON p.UserID = u.UserID WHERE u.Role = 'Admin'";
+            String query = "SELECT p.ProductID, p.Name, p.Price, u.FullName FROM products p JOIN users u ON p.UserID = u.UserID WHERE u.Role = 'Admin'";
             try (PreparedStatement ps = con.prepareStatement(query);
                  ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String productId = rs.getString("ProductID");
                     String name = rs.getString("Name");
                     double price = rs.getDouble("Price");
-                    String supplierName = rs.getString("Username");
+                    String fullName = rs.getString("FullName");
 
                     if (name == null) {
                         name = "N/A";
                     }
 
-                    if (supplierName == null) {
-                        supplierName = "N/A";
+                    if (fullName == null) {
+                        fullName = "N/A";
                     }
 
                     NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
                     String formattedPrice = formatter.format(price);
 
-                    productTableModel.addRow(new Object[]{productId, name, formattedPrice, supplierName});
+                    productTableModel.addRow(new Object[]{productId, name, formattedPrice, fullName});
                 }
             }
         } catch (Exception e) {
@@ -52,7 +52,6 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     }
 
     private void updateProductDetails(String productId) {
-
         try (Connection con = DBConnection.Connect()) {
             String query = "SELECT Name, Description, UserID FROM products WHERE ProductID = ?";
             try (PreparedStatement ps = con.prepareStatement(query)) {
@@ -66,7 +65,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     lblProductName.setText(name);
                     lblProductDesc.setText(description);
                     lblProductImage.setIcon(new ImageIcon(getProductImage(productId))); 
-                    lblSupplierName.setText("Seller: " + getSupplierName(userId));
+                    lblSupplierName.setText("Seller: " + getName(userId));
                     lblQuantity.setText("1");
                 }
             }
@@ -75,22 +74,22 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         }
     }
 
-    private String getSupplierName(String userId) {
-        String supplierName = "";
+    private String getName(String userId) {
+        String Name = "";
 
         try (Connection con = DBConnection.Connect()) {
-            String query = "SELECT Username FROM users WHERE UserID = ?";
+            String query = "SELECT FullName FROM users WHERE UserID = ?";
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 ps.setString(1, userId);
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
-                    supplierName = rs.getString("Username");
+                    Name = rs.getString("FullName");
                 }
             }
         } catch (Exception e) {
             System.out.println("Error retrieving supplier name: " + e.getMessage());
         }
-        return supplierName;
+        return Name;
     }
 
     private String getProductImage(String productId) {
