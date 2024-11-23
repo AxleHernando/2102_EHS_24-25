@@ -132,6 +132,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     private void insertOrderIntoDatabase(String userID, String modeOfPayment) {
         try (Connection con = DBConnection.Connect()) {
             String insertOrderQuery = "INSERT INTO orders (UserID, ProductID, Quantity, Price, Status, ModeOfPayment) VALUES (?, ?, ?, ?, ?, ?)";
+            String insertSalesQuery = "INSERT INTO sales (UserID, ProductID, Quantity, TotalPrice, SaleDate) VALUES (?, ?, ?, ?, NOW())";
 
             for (int i = 0; i < cartTableModel.getRowCount(); i++) {
                 String productId = cartTableModel.getValueAt(i, 0).toString();
@@ -149,14 +150,22 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     ps.setString(6, modeOfPayment);
                     ps.executeUpdate();
                 }
+
+                try (PreparedStatement ps = con.prepareStatement(insertSalesQuery)) {
+                    ps.setString(1, userID);
+                    ps.setString(2, productId);
+                    ps.setInt(3, quantity);
+                    ps.setDouble(4, price);
+                    ps.executeUpdate();
+                }
             }
 
-            cartTableModel.setRowCount(0); 
+            cartTableModel.setRowCount(0);
             updateTotal();
             JOptionPane.showMessageDialog(null, "Order placed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
             System.out.println("Error during checkout: " + e.getMessage());
-            JOptionPane.showMessageDialog(null, "An error occurred while placing the order. Please try again.", "Error", JOptionPane.ERROR_MESSAGE); 
+            JOptionPane.showMessageDialog(null, "An error occurred while placing the order. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -205,6 +214,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         btnRemoveProduct = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Shopaloo Dashboard");
         setResizable(false);
 
         MainPanel.setBackground(new java.awt.Color(248, 248, 248));

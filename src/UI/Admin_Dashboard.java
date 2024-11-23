@@ -109,6 +109,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         btnViewSales = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Admin Dashboard");
         setResizable(false);
 
         MainPanel.setBackground(new java.awt.Color(248, 248, 248));
@@ -399,35 +400,8 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRemoveProductActionPerformed
 
     private void btnViewSalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewSalesActionPerformed
-        String loggedInUserId = getLoggedInUserID();
-        
-        try (Connection con = DBConnection.Connect()) {
-            String query = "SELECT s.SaleID, p.Name, s.Quantity, s.TotalPrice, s.SaleDate "
-                    + "FROM sales s "
-                    + "JOIN products p ON s.ProductID = p.ProductID "
-                    + "WHERE p.UserID = ?";
-            try (PreparedStatement ps = con.prepareStatement(query)) {
-                ps.setString(1, loggedInUserId);
-                try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        String saleId = rs.getString("SaleID");
-                        String productName = rs.getString("Name");
-                        int quantity = rs.getInt("Quantity");
-                        double totalPrice = rs.getDouble("TotalPrice");
-                        String saleDate = rs.getString("SaleDate");
-
-                        salesModel.addRow(new Object[]{saleId, productName, quantity, totalPrice, saleDate});
-                    }
-                }
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error loading sales: " + e.getMessage());
-        }
-
-        // Add the table to a JScrollPane and display it
-        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(salesTable);
-        salesFrame.add(scrollPane);
-        salesFrame.setVisible(true);
+        Sales_Table salesTableFrame = new Sales_Table();
+        salesTableFrame.setVisible(true);
     }//GEN-LAST:event_btnViewSalesActionPerformed
 
     private void Table_ProductsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Table_ProductsMouseClicked

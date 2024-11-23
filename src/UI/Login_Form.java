@@ -48,7 +48,7 @@ public class Login_Form extends javax.swing.JFrame {
         txtUsername = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("E-HUB SALES");
+        setTitle("Shopaloo");
         setBackground(new java.awt.Color(255, 255, 255));
         setResizable(false);
 

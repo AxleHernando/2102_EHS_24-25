@@ -26,6 +26,7 @@ public class SignUp_Form extends javax.swing.JFrame {
         btnBack = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Sign Up");
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(211, 211, 211));
