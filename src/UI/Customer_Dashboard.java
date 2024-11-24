@@ -1,6 +1,7 @@
 package UI;
 
 import Databases.DBConnection;
+import java.awt.event.KeyEvent;
 import javax.swing.*;
 
 import java.sql.Connection;
@@ -39,7 +40,9 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     if (fullName == null) {
                         fullName = "N/A";
                     }
-
+                    
+                    updateProductDetails(productId);
+                    
                     NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
                     String formattedPrice = formatter.format(price);
 
@@ -64,9 +67,13 @@ public class Customer_Dashboard extends javax.swing.JFrame {
 
                     lblProductName.setText(name);
                     lblProductDesc.setText(description);
-                    lblProductImage.setIcon(new ImageIcon(getProductImage(productId))); 
                     lblSupplierName.setText("Seller: " + getName(userId));
                     lblQuantity.setText("1");
+                    
+                    lblProductImage.setIcon(null);
+
+                    ImageIcon productImage = new ImageIcon(getProductImage(productId));
+                    lblProductImage.setIcon(productImage);
                 }
             }
         } catch (Exception e) {
@@ -122,9 +129,37 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         return Login_Form.loggedInUserID;
     }
     
-    private void setColumnWidths(JTable sourceTable, JTable targetTable) {
-        for (int i = 0; i < sourceTable.getColumnCount(); i++) {
-            targetTable.getColumnModel().getColumn(i).setPreferredWidth(sourceTable.getColumnModel().getColumn(i).getPreferredWidth());
+    private void searchProducts() {
+        String searchText = txtSearch.getText().toLowerCase();
+        productTableModel.setRowCount(0);
+
+        try (Connection con = DBConnection.Connect()) {
+            String query = "SELECT p.ProductID, p.Name, p.Price, u.FullName "
+                    + "FROM products p JOIN users u ON p.UserID = u.UserID "
+                    + "WHERE u.Role = 'Admin' AND (LOWER(p.Name) LIKE ? OR LOWER(u.FullName) LIKE ? OR LOWER(p.ProductID) LIKE ?)";
+
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                String searchPattern = "%" + searchText + "%";
+                ps.setString(1, searchPattern);
+                ps.setString(2, searchPattern);
+                ps.setString(3, searchPattern);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String productId = rs.getString("ProductID");
+                        String name = rs.getString("Name");
+                        double price = rs.getDouble("Price");
+                        String fullName = rs.getString("FullName");
+
+                        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
+                        String formattedPrice = formatter.format(price);
+
+                        productTableModel.addRow(new Object[]{productId, name, formattedPrice, fullName});
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error searching products: " + e.getMessage());
         }
     }
     
@@ -200,6 +235,9 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         Table_Products = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
         lblProductDesc = new javax.swing.JTextArea();
+        txtSearch = new javax.swing.JTextField();
+        lblSearch = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
         btnCheckOut = new javax.swing.JButton();
         btnAddToCart = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
@@ -240,6 +278,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         lblShoppingCart.setText("Shopping Cart");
 
         lblProductImage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblProductImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         lblProductName.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
         lblProductName.setText("...");
@@ -283,6 +322,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                 "ID", "Name", "Price", "Seller"
             }
         ));
+        Table_Products.setName(""); // NOI18N
         Table_Products.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 Table_ProductsMouseClicked(evt);
@@ -294,7 +334,48 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         lblProductDesc.setRows(5);
         lblProductDesc.setToolTipText("");
         lblProductDesc.setWrapStyleWord(true);
+        lblProductDesc.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        lblProductDesc.setEnabled(false);
         jScrollPane2.setViewportView(lblProductDesc);
+
+        txtSearch.setText("Search");
+        txtSearch.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchMouseClicked(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                txtSearchMouseExited(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                txtSearchMouseReleased(evt);
+            }
+        });
+        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchKeyPressed(evt);
+            }
+        });
+
+        lblSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Search.png"))); // NOI18N
+        lblSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblSearch.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblSearchMouseClicked(evt);
+            }
+        });
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -303,7 +384,6 @@ public class Customer_Dashboard extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 710, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(lblProductImage, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -316,21 +396,38 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btnMinusQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(lblProductName)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap())
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 430, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblSearch)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 530, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblSearch))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(11, 11, 11)
                         .addComponent(lblProductName)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(lblSupplierName)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -617,7 +714,6 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(null, "Please select a product to add to cart.", "Warning", JOptionPane.WARNING_MESSAGE);
         }
-        setColumnWidths(Table_Products, Table_ShoppingCart);
     }//GEN-LAST:event_btnAddToCartActionPerformed
 
     private void btnPlusQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlusQuantityActionPerformed
@@ -659,6 +755,28 @@ public class Customer_Dashboard extends javax.swing.JFrame {
             }
     }//GEN-LAST:event_Table_ProductsMouseClicked
 
+    private void txtSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            searchProducts();
+        }
+    }//GEN-LAST:event_txtSearchKeyPressed
+
+    private void lblSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSearchMouseClicked
+        searchProducts();
+    }//GEN-LAST:event_lblSearchMouseClicked
+
+    private void txtSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseClicked
+        txtSearch.setText("");
+    }//GEN-LAST:event_txtSearchMouseClicked
+
+    private void txtSearchMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseExited
+        
+    }//GEN-LAST:event_txtSearchMouseExited
+
+    private void txtSearchMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseReleased
+        
+    }//GEN-LAST:event_txtSearchMouseReleased
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MainPanel;
     private javax.swing.JTable Table_Products;
@@ -674,6 +792,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> comboModeOfPayment;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -681,8 +800,10 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel lblProductImage;
     private javax.swing.JLabel lblProductName;
     private javax.swing.JLabel lblQuantity;
+    private javax.swing.JLabel lblSearch;
     private javax.swing.JLabel lblShoppingCart;
     private javax.swing.JLabel lblSupplierName;
     private javax.swing.JLabel lblTotal;
+    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2024 at 08:13 AM
+-- Generation Time: Nov 24, 2024 at 05:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -38,6 +38,13 @@ CREATE TABLE `cardpayment` (
   `TransactionDate` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `cardpayment`
+--
+
+INSERT INTO `cardpayment` (`CardID`, `UserID`, `CardNo`, `CVC`, `CardHolder`, `Expiry`, `Payment`, `TransactionDate`) VALUES
+(1, 14, '1234567891234567', '123', 'Bimbi', '11/27', 220000.00, '2024-11-24 14:00:17');
+
 -- --------------------------------------------------------
 
 --
@@ -56,11 +63,7 @@ CREATE TABLE `cashpayment` (
 --
 
 INSERT INTO `cashpayment` (`CashID`, `UserID`, `CashTendered`, `TransactionDate`) VALUES
-(6, 7, 80000.00, '2024-11-23 14:09:07'),
-(7, 9, 100000.00, '2024-11-23 14:13:18'),
-(8, 7, 30000.00, '2024-11-23 14:45:16'),
-(9, 9, 30000.00, '2024-11-23 14:45:29'),
-(10, 10, 240000.00, '2024-11-23 15:08:21');
+(1, 12, 240000.00, '2024-11-24 16:06:05');
 
 -- --------------------------------------------------------
 
@@ -83,14 +86,9 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`OrderID`, `UserID`, `ProductID`, `Quantity`, `OrderDate`, `Price`, `ModeOfPayment`) VALUES
-(33, 7, 2, 1, '2024-11-23 06:08:25', 40000.00, 'Cash On Delivery'),
-(34, 7, 2, 1, '2024-11-23 06:09:06', 40000.00, 'Cash On Delivery'),
-(35, 9, 4, 1, '2024-11-23 06:13:17', 20000.00, 'Cash On Delivery'),
-(36, 9, 6, 2, '2024-11-23 06:13:17', 30000.00, 'Cash On Delivery'),
-(37, 7, 6, 1, '2024-11-23 06:45:15', 15000.00, 'Cash On Delivery'),
-(38, 9, 6, 1, '2024-11-23 06:45:28', 15000.00, 'Cash On Delivery'),
-(39, 10, 6, 2, '2024-11-23 07:08:20', 30000.00, 'Cash On Delivery'),
-(40, 10, 3, 3, '2024-11-23 07:08:20', 90000.00, 'Cash On Delivery');
+(1, 14, 1, 2, '2024-11-24 06:00:18', 100000.00, 'Card Payment'),
+(2, 14, 2, 3, '2024-11-24 06:00:18', 120000.00, 'Card Payment'),
+(3, 12, 3, 4, '2024-11-24 08:06:01', 120000.00, 'Cash On Delivery');
 
 -- --------------------------------------------------------
 
@@ -100,6 +98,7 @@ INSERT INTO `orders` (`OrderID`, `UserID`, `ProductID`, `Quantity`, `OrderDate`,
 
 CREATE TABLE `products` (
   `ProductID` int(11) NOT NULL,
+  `Category` enum('Gadgets','Hygiene','Clothes','Appliances','Kitchen') NOT NULL,
   `Name` varchar(255) DEFAULT NULL,
   `Description` varchar(255) DEFAULT NULL,
   `Price` decimal(10,2) DEFAULT NULL,
@@ -111,12 +110,32 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`ProductID`, `Name`, `Description`, `Price`, `UserID`, `Stocks`) VALUES
-(1, 'Laptop', 'High-End Gaming Laptop for Gamers', 50000.00, 6, 10),
-(2, 'iPhone', 'Newly Launched High-End Mobile Phone', 40000.00, 6, 10),
-(3, 'PlayStation 5', 'Next-Gen Gaming Console', 30000.00, 6, 10),
-(4, 'Nintendo Switch', 'A Versatile Gaming Console', 20000.00, 6, 10),
-(6, 'AirPods', 'Wireless Bluetooth EarBuds designed by Apple', 15000.00, 6, 10);
+INSERT INTO `products` (`ProductID`, `Category`, `Name`, `Description`, `Price`, `UserID`, `Stocks`) VALUES
+(1, 'Gadgets', 'Laptop', 'High-End Gaming Laptop for Gamers', 50000.00, 6, 10),
+(2, 'Gadgets', 'iPhone', 'Newly Launched High-End Mobile Phone', 40000.00, 6, 10),
+(3, 'Gadgets', 'PlayStation 5', 'Next-Gen Gaming Console', 30000.00, 6, 10),
+(4, 'Gadgets', 'Nintendo Switch', 'A Versatile Gaming Console', 20000.00, 6, 10),
+(6, 'Gadgets', 'AirPods', 'Wireless Bluetooth EarBuds designed by Apple', 15000.00, 6, 10),
+(14, 'Gadgets', 'Tissue', 'All Around Hygienic Tissue', 20.00, 15, 200),
+(18, 'Gadgets', 'Toothbrush ', 'Soft-Bristled For Gentle Cleaning', 30.00, 15, 500),
+(19, 'Gadgets', 'Comb', 'Suitable For All Hair Types', 50.00, 15, 4000),
+(20, 'Gadgets', 'Soap', 'Moisturizing And Nourishing', 30.00, 15, 300),
+(21, 'Gadgets', 'Nailcutter', 'Maintain Clean And Healthy Nails', 45.00, 15, 300),
+(22, 'Gadgets', 'Coats', 'Stay Warm And Stylish', 500.00, 16, 1000),
+(23, 'Gadgets', 'T-Shirts', 'Soft, Breathable Fabrics', 400.00, 16, 5000),
+(24, 'Gadgets', 'Shorts', 'Comfort In Every Stitch', 450.00, 16, 5000),
+(25, 'Gadgets', 'Underwear', 'Variety Of Styles And Size', 300.00, 16, 7000),
+(26, 'Gadgets', 'Leggings', 'Soft And Seamless Construction', 150.00, 16, 4000),
+(27, 'Gadgets', 'Refrigerator', 'Rapid Cooling Technology ', 1000.00, 17, 15000),
+(28, 'Gadgets', 'Washing Machine', 'Stain Free, Stress Free', 1400.00, 17, 1200),
+(29, 'Gadgets', 'Vacuum Cleaner', 'Powerful Suction, Quiet Operation', 1500.00, 17, 3000),
+(30, 'Gadgets', 'Air Conditioning', 'Cooling Comfort, Effortless Convience', 30000.00, 17, 500),
+(31, 'Gadgets', 'Televisions', 'Experience Stunning Picture Quality ', 30000.00, 17, 2000),
+(32, 'Gadgets', 'Pots', 'Cook With Confindence Everytime', 200.00, 18, 500),
+(33, 'Gadgets', 'Whisk ', 'Mix, Blend, And Stir With Ease', 100.00, 18, 500),
+(34, 'Gadgets', 'Graters', 'Precision Grating For Home Cooks', 400.00, 18, 300),
+(35, 'Gadgets', 'Canisters', 'Store, Organize And Preserve', 300.00, 18, 20),
+(36, 'Gadgets', 'Bowls', 'Versatile And Durable', 200.00, 18, 100);
 
 -- --------------------------------------------------------
 
@@ -144,7 +163,10 @@ INSERT INTO `sales` (`SaleID`, `ProductID`, `Quantity`, `TotalPrice`, `SaleDate`
 (4, 6, 1, 15000.00, '2024-11-23 14:45:15', 7),
 (5, 6, 1, 15000.00, '2024-11-23 14:45:28', 9),
 (6, 6, 2, 30000.00, '2024-11-23 15:08:20', 10),
-(7, 3, 3, 90000.00, '2024-11-23 15:08:20', 10);
+(7, 3, 3, 90000.00, '2024-11-23 15:08:20', 10),
+(8, 1, 2, 100000.00, '2024-11-24 14:00:18', 14),
+(9, 2, 3, 120000.00, '2024-11-24 14:00:18', 14),
+(10, 3, 4, 120000.00, '2024-11-24 16:06:01', 12);
 
 -- --------------------------------------------------------
 
@@ -169,7 +191,15 @@ INSERT INTO `users` (`UserID`, `Username`, `Password`, `Role`, `CreatedAt`, `Ful
 (6, 'linuxadona', 'admin123', 'Admin', '2024-11-20 10:53:58', 'Linux Mandrake Adona'),
 (7, 'axlehernando', 'cust123', 'Customer', '2024-11-20 10:56:36', 'Axle Hernando'),
 (9, 'kayemacalalad', '12345678', 'Customer', '2024-11-23 06:13:03', 'Kaye Macalalad'),
-(10, 'kristinegandaa', 'kristine03', 'Customer', '2024-11-23 07:07:32', 'kristine de torres');
+(10, 'kristinegandaa', 'kristine03', 'Customer', '2024-11-23 07:07:32', 'kristine de torres'),
+(11, 'felmaneleponga', 'felman123', 'Customer', '2024-11-24 05:50:57', 'Felman Eleponga'),
+(12, 'aeron', 'aeron123', 'Customer', '2024-11-24 05:53:05', 'Aeron Salanguit'),
+(13, 'millanabrenica', 'millan123', 'Admin', '2024-11-24 05:57:13', 'Millan Bimbi'),
+(14, 'millanabrenics', 'millan123', 'Customer', '2024-11-24 05:57:43', 'millan bimbi'),
+(15, 'xyreel', 'xy123', 'Admin', '2024-11-24 08:26:01', 'Xyreel Laguras'),
+(16, 'rome', 'rome123', 'Admin', '2024-11-24 08:54:24', 'Rome Dyanne Salvid'),
+(17, 'Maricris', 'mari123', 'Admin', '2024-11-24 09:07:04', 'Maricris Barcelon'),
+(18, 'Djanisse', 'dj123', 'Admin', '2024-11-24 09:21:02', 'Djanisse Villafor');
 
 --
 -- Indexes for dumped tables
@@ -226,37 +256,37 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cardpayment`
 --
 ALTER TABLE `cardpayment`
-  MODIFY `CardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `CardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `cashpayment`
 --
 ALTER TABLE `cashpayment`
-  MODIFY `CashID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `CashID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `OrderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `OrderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `sales`
 --
 ALTER TABLE `sales`
-  MODIFY `SaleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `SaleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- Constraints for dumped tables

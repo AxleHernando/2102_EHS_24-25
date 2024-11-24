@@ -1,30 +1,40 @@
 package UI;
 
 import Databases.DBConnection;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.NumberFormat;
 import java.util.Locale;
+import javax.imageio.ImageIO;
 
 import javax.swing.JOptionPane;
 
 public class Edit_Products extends javax.swing.JFrame {
-    private Admin_Dashboard adminDashboard;
+    private final Admin_Dashboard adminDashboard;
 
     public Edit_Products(Admin_Dashboard adminDashboard) {
         initComponents();
         this.adminDashboard = adminDashboard;
     }
     
+    private String getLoggedInUserID() {
+        return Login_Form.loggedInUserID;
+    }
+    
     public void loadProductIDs() {
         try (Connection con = DBConnection.Connect()) {
-            String query = "SELECT ProductID FROM products";
-            try (PreparedStatement ps = con.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
-                comboID.removeAllItems();
-                while (rs.next()) {
-                    comboID.addItem(rs.getString("ProductID"));
+            String query = "SELECT ProductID FROM products WHERE UserID = ?";
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                ps.setString(1, getLoggedInUserID()); 
+                try (ResultSet rs = ps.executeQuery()) { 
+                    comboID.removeAllItems(); 
+                    while (rs.next()) {
+                        comboID.addItem(rs.getString("ProductID")); 
+                    }
                 }
             }
         } catch (Exception e) {
@@ -79,6 +89,7 @@ public class Edit_Products extends javax.swing.JFrame {
         btnAddImage = new javax.swing.JButton();
         txtFilePath = new javax.swing.JTextField();
         comboID = new javax.swing.JComboBox<>();
+        jLabel5 = new javax.swing.JLabel();
 
         setResizable(false);
 
@@ -143,52 +154,58 @@ public class Edit_Products extends javax.swing.JFrame {
             }
         });
 
+        jLabel5.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+        jLabel5.setText("Product ID");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblWelcome)
-                .addGap(70, 70, 70))
             .addGroup(layout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnAddImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtFilePath, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(lblWelcome)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(comboID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(txtPrice))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(txtStocks, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(txtDesc)
-                    .addComponent(btnSubmit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jLabel5))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(btnAddImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtFilePath, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(jLabel1)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(comboID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel3)
+                                    .addGap(0, 0, Short.MAX_VALUE))
+                                .addComponent(txtPrice))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel4)
+                                .addComponent(txtStocks, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtDesc)
+                        .addComponent(btnSubmit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(29, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(lblWelcome)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(33, 33, 33)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblWelcome)
+                        .addGap(32, 32, 32)
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
+                        .addGap(39, 39, 39)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(comboID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -219,45 +236,98 @@ public class Edit_Products extends javax.swing.JFrame {
 
     private void btnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmitActionPerformed
         String selectedID = (String) comboID.getSelectedItem();
-        try (Connection con = DBConnection.Connect()) {
-            String query = "UPDATE products SET Name = ?, Description = ?, Price = ?, Stocks = ? WHERE ProductID = ?";
-            try (PreparedStatement ps = con.prepareStatement(query)) {
-                ps.setString(1, txtName.getText());
-                ps.setString(2, txtDesc.getText());
-                ps.setDouble(3, Double.parseDouble(txtPrice.getText()));
-                ps.setInt(4, Integer.parseInt(txtStocks.getText()));
-                ps.setString(5, selectedID);
 
-                NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
-                String formattedPrice = formatter.format(Double.parseDouble(txtPrice.getText()));
-                
-                String message = "Name: " + txtName.getText() + "\n"
-                        + "Description: " + txtDesc.getText() + "\n"
-                        + "Price: " + formattedPrice + "\n"
-                        + "Stocks: " + txtStocks.getText() + "\n"
-                        + "Do you want to proceed?";
-                int confirm = JOptionPane.showConfirmDialog(this, message,
-                        "Confirm Checkout", JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE);
+        txtName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
+        txtDesc.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
+        txtPrice.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
+        txtStocks.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
 
-                if (confirm == JOptionPane.YES_OPTION) {
-                    
-                    int rowsAffected = ps.executeUpdate();
-                    if (rowsAffected > 0) {
-                        JOptionPane.showMessageDialog(this, "Product updated successfully!");
-                        adminDashboard.refreshProducts();
-                        this.dispose();
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Failed to update product.");
-                    }
-                    this.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Adding Products Canceled.",
-                            "Cancellation", JOptionPane.INFORMATION_MESSAGE);
-                }
+        boolean isValid = true;
+
+        if (txtName.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Name field is required.");
+            txtName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+            isValid = false;
+        }
+
+        if (txtDesc.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Description field is required.");
+            txtDesc.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+            isValid = false;
+        }
+
+        if (txtPrice.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Price field is required.");
+            txtPrice.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+            isValid = false;
+        } else {
+            try {
+                Double.parseDouble(txtPrice.getText());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Price must be a number.");
+                txtPrice.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+                isValid = false;
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
+
+        if (txtStocks.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Stocks field is required.");
+            txtStocks.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+            isValid = false;
+        } else {
+            try {
+                Integer.parseInt(txtStocks.getText());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Stocks must be a whole number.");
+                txtStocks.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+                isValid = false;
+            }
+        }
+
+        if (selectedID == null) {
+            JOptionPane.showMessageDialog(this, "Please select a product to update.");
+            isValid = false;
+        }
+
+        if (isValid) {
+            try (Connection con = DBConnection.Connect()) {
+                String query = "UPDATE products SET Name = ?, Description = ?, Price = ?, Stocks = ? WHERE ProductID = ?";
+                try (PreparedStatement ps = con.prepareStatement(query)) {
+                    ps.setString(1, txtName.getText());
+                    ps.setString(2, txtDesc.getText());
+                    ps.setDouble(3, Double.parseDouble(txtPrice.getText()));
+                    ps.setInt(4, Integer.parseInt(txtStocks.getText()));
+                    ps.setString(5, selectedID);
+
+                    NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
+                    String formattedPrice = formatter.format(Double.parseDouble(txtPrice.getText()));
+
+                    String message = "Name: " + txtName.getText() + "\n"
+                            + "Description: " + txtDesc.getText() + "\n"
+                            + "Price: " + formattedPrice + "\n"
+                            + "Stocks: " + txtStocks.getText() + "\n"
+                            + "Do you want to proceed?";
+                    int confirm = JOptionPane.showConfirmDialog(this, message,
+                            "Confirm Update", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
+
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        int rowsAffected = ps.executeUpdate();
+                        if (rowsAffected > 0) {
+                            JOptionPane.showMessageDialog(this, "Product updated successfully!");
+                            adminDashboard.refreshProducts();
+                            this.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Failed to update product.");
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Updating product canceled.",
+                                "Cancellation", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            }
         }
     }//GEN-LAST:event_btnSubmitActionPerformed
 
@@ -344,6 +414,7 @@ public class Edit_Products extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel lblWelcome;
     private javax.swing.JTextField txtDesc;
     private javax.swing.JTextField txtFilePath;

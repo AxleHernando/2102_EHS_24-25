@@ -1,13 +1,14 @@
 package UI;
 
 import Databases.DBConnection;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.NumberFormat;
 import java.util.Locale;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -44,6 +45,8 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                         if (name == null) {
                             name = "N/A";
                         }
+                        
+                        updateProductDetails(productId);
 
                         NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
                         String formattedPrice = formatter.format(price);
@@ -59,11 +62,32 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     
     public void refreshProducts() {
         loadProducts();
+        
+        int selectedRow = Table_Products.getSelectedRow();
+        if (selectedRow != -1) {
+            String productId = Table_Products.getValueAt(selectedRow, 0).toString();
+            updateProductDetails(productId);
+        } else {
+            // Optionally, clear the product details if no product is selected
+            lblProductName.setText("...");
+            lblProductDesc.setText("");
+            lblStocks.setText("Stocks: ...");
+            lblProductImage.setIcon(null); // Clear the image if no product is selected
+        }
+    }
+
+    private BufferedImage loadProductImage(String productId) {
+        String imagePath = getProductImage(productId);
+        try {
+            return ImageIO.read(new File(imagePath)); 
+        } catch (Exception e) {
+            System.out.println("Error loading image: " + e.getMessage());
+            return null; 
+        }
     }
     
     private String getProductImage(String productId) {
-        String imagePath = "src/product_images/" + productId + ".jpg";
-        return imagePath;
+        return "src/product_images/" + productId + ".jpg"; 
     }
     
     private void updateProductDetails(String productId) {
@@ -78,9 +102,15 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                     String stocks = rs.getString("Stocks");
 
                     lblProductName.setText(name);
-                    lblProductDesc.setText(description);
-                    lblProductImage.setIcon(new ImageIcon(getProductImage(productId))); 
+                    lblProductDesc.setText(description); 
                     lblStocks.setText("Stocks: " + stocks);
+                    
+                    BufferedImage img = loadProductImage(productId);
+                    if (img != null) {
+                        lblProductImage.setIcon(new ImageIcon(img)); // Set the image icon
+                    } else {
+                        lblProductImage.setIcon(null); // Clear if image is not found
+                    }
                 }
             }
         } catch (Exception e) {
@@ -92,10 +122,10 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lblWelcome = new javax.swing.JLabel();
         MainPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         Table_Products = new javax.swing.JTable();
-        lblProducts = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         lblProductImage = new javax.swing.JLabel();
         lblProductName = new javax.swing.JLabel();
@@ -107,6 +137,11 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         btnRemoveProduct = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
         btnViewSales = new javax.swing.JButton();
+        lblWelcome1 = new javax.swing.JLabel();
+        btnRefresh = new javax.swing.JButton();
+
+        lblWelcome.setFont(new java.awt.Font("Helvetica", 1, 26)); // NOI18N
+        lblWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Admin Dashboard");
@@ -132,11 +167,9 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(Table_Products);
 
-        lblProducts.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
-        lblProducts.setText("Products");
-
         lblProductImage.setBackground(new java.awt.Color(255, 255, 255));
         lblProductImage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblProductImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         lblProductName.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
         lblProductName.setText("...");
@@ -237,6 +270,19 @@ public class Admin_Dashboard extends javax.swing.JFrame {
             }
         });
 
+        lblWelcome1.setFont(new java.awt.Font("Helvetica", 1, 26)); // NOI18N
+        lblWelcome1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblWelcome1.setIcon(new javax.swing.ImageIcon("C:\\Users\\ADMIN\\Downloads\\SHOP-A-LOO (1) (2).png")); // NOI18N
+
+        btnRefresh.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
+        btnRefresh.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/refresh.png"))); // NOI18N
+        btnRefresh.setText("REFRESH");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(MainPanel);
         MainPanel.setLayout(MainPanelLayout);
         MainPanelLayout.setHorizontalGroup(
@@ -248,34 +294,35 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(MainPanelLayout.createSequentialGroup()
-                        .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(MainPanelLayout.createSequentialGroup()
-                                .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(MainPanelLayout.createSequentialGroup()
-                                        .addComponent(btnAddProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnEditProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(28, 28, 28)
-                                        .addComponent(btnRemoveProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(MainPanelLayout.createSequentialGroup()
-                                        .addComponent(lblProducts)
-                                        .addGap(258, 258, 258)))
+                        .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, MainPanelLayout.createSequentialGroup()
+                                .addComponent(btnAddProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnEditProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(28, 28, 28)
+                                .addComponent(btnRemoveProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(132, 132, 132)
-                                .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btnViewSales, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(jScrollPane1))
+                                .addComponent(btnViewSales, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(MainPanelLayout.createSequentialGroup()
+                                .addComponent(lblWelcome1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnRefresh)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap())))
         );
         MainPanelLayout.setVerticalGroup(
             MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(MainPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblProducts)
-                    .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(12, 12, 12)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblWelcome1)
+                    .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnRefresh)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -323,23 +370,6 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     private void btnAddProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddProductActionPerformed
         new Add_Products(this).setVisible(true);
     }//GEN-LAST:event_btnAddProductActionPerformed
-
-    private void deleteProductImage(String productId) {
-        try {
-            java.io.File imageFile = new java.io.File("src/product_images/" + productId + ".jpg");
-            if (imageFile.exists()) {
-                if (imageFile.delete()) {
-                    JOptionPane.showMessageDialog(this, "Image file deleted successfully: " + imageFile.getAbsolutePath());
-                } else {
-                    JOptionPane.showMessageDialog(this, "Failed to delete image file: " + imageFile.getAbsolutePath());
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "No image file found for ProductID: " + productId);
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error deleting image file: " + e.getMessage());
-        }
-    }
     
     private void btnRemoveProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveProductActionPerformed
         int selectedRow = Table_Products.getSelectedRow();
@@ -409,12 +439,17 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_Table_ProductsMouseClicked
 
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        refreshProducts();
+    }//GEN-LAST:event_btnRefreshActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MainPanel;
     private javax.swing.JTable Table_Products;
     private javax.swing.JButton btnAddProduct;
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnEditProduct;
+    private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnRemoveProduct;
     private javax.swing.JButton btnViewSales;
     private javax.swing.JPanel jPanel2;
@@ -423,7 +458,8 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     private javax.swing.JTextArea lblProductDesc;
     private javax.swing.JLabel lblProductImage;
     private javax.swing.JLabel lblProductName;
-    private javax.swing.JLabel lblProducts;
     private javax.swing.JLabel lblStocks;
+    private javax.swing.JLabel lblWelcome;
+    private javax.swing.JLabel lblWelcome1;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,12 +1,16 @@
 package UI;
 
 import Databases.DBConnection;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.NumberFormat;
 import java.util.Locale;
+import javax.imageio.ImageIO;
 
 import javax.swing.JOptionPane;
 
@@ -19,25 +23,6 @@ public class Add_Products extends javax.swing.JFrame {
         initComponents();
         this.adminDashboard = adminDashboard;
         txtFilePath.setEditable(false);
-    }
-    
-    private String getNextProductID() {
-        try (Connection con = DBConnection.Connect()) {
-            String query = "SELECT MAX(ProductID) AS MaxID FROM products";
-            try (PreparedStatement ps = con.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int maxID = rs.getInt("MaxID");
-                    nextProductID = String.valueOf(maxID + 1);
-                }
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error fetching next ProductID: " + e.getMessage());
-        }
-        return nextProductID;
-    }
-    
-    private void setNextProductID(String productID) {
-        this.nextProductID = productID;
     }
     
     @SuppressWarnings("unchecked")
@@ -193,59 +178,111 @@ public class Add_Products extends javax.swing.JFrame {
     }//GEN-LAST:event_btnViewSalesActionPerformed
 
     private void btnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmitActionPerformed
-        try (Connection con = DBConnection.Connect()) {
-            String query = "INSERT INTO products (Name, Description, Price, Stocks, UserID) VALUES (?, ?, ?, ?, ?)";
-            try (PreparedStatement ps = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, txtName.getText());
-                ps.setString(2, txtDesc.getText());
-                ps.setDouble(3, Double.parseDouble(txtPrice.getText()));
-                ps.setInt(4, Integer.parseInt(txtStocks.getText()));
-                ps.setString(5, Login_Form.loggedInUserID);
+        txtName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
+        txtDesc.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
+        txtPrice.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
+        txtStocks.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
+        txtFilePath.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
+
+        boolean isValid = true;
+
+        if (txtName.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Name field is required.");
+            txtName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+            isValid = false;
+        }
+
+        if (txtDesc.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Description field is required.");
+            txtDesc.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+            isValid = false;
+        }
+
+        if (txtPrice.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Price field is required.");
+            txtPrice.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+            isValid = false;
+        } else {
+            try {
+                Double.parseDouble(txtPrice.getText());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Price must be a number.");
+                txtPrice.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+                isValid = false;
+            }
+        }
+
+        if (txtStocks.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Stocks field is required.");
+            txtStocks.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+            isValid = false;
+        } else {
+            try {
+                Integer.parseInt(txtStocks.getText());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Stocks must be a whole number.");
+                txtStocks.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+                isValid = false;
+            }
+        }
+
+        if (selectedFile == null) {
+            JOptionPane.showMessageDialog(this, "Please select an image for the product.");
+            isValid = false;
+        }
+
+        if (isValid) {
+            try (Connection con = DBConnection.Connect()) {
+                String query = "INSERT INTO products (Name, Description, Price, Stocks, UserID) VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement ps = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    ps.setString(1, txtName.getText());
+                    ps.setString(2, txtDesc.getText());
+                    ps.setDouble(3, Double.parseDouble(txtPrice.getText()));
+                    ps.setInt(4, Integer.parseInt(txtStocks.getText()));
+                    ps.setString(5, Login_Form.loggedInUserID);
 
                 NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
-                String formattedPrice = formatter.format(Double.parseDouble(txtPrice.getText()));
+                    String formattedPrice = formatter.format(Double.parseDouble(txtPrice.getText()));
 
-                String message = "Name: " + txtName.getText() + "\n"
-                        + "Description: " + txtDesc.getText() + "\n"
-                        + "Price: " + formattedPrice + "\n"
-                        + "Stocks: " + txtStocks.getText() + "\n"
-                        + "Do you want to proceed?";
-                int confirm = JOptionPane.showConfirmDialog(this, message,
-                        "Confirm Checkout", JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE);
+                    String message = "Name: " + txtName.getText() + "\n"
+                            + "Description: " + txtDesc.getText() + "\n"
+                            + "Price: " + formattedPrice + "\n"
+                            + "Stocks: " + txtStocks.getText() + "\n"
+                            + "Do you want to proceed?";
+                    int confirm = JOptionPane.showConfirmDialog(this, message,
+                            "Confirm Checkout", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
 
-                if (confirm == JOptionPane.YES_OPTION) {
-                    int rowsAffected = ps.executeUpdate();
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        int rowsAffected = ps.executeUpdate();
 
-                    // Get the generated ProductID
-                    try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                        if (generatedKeys.next()) {
-                            int productId = generatedKeys.getInt(1); // Get the generated ProductID
-                            String productIDString = String.valueOf(productId);
+                        try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                            if (generatedKeys.next()) {
+                                int productId = generatedKeys.getInt(1);
+                                String productIDString = String.valueOf(productId);
 
-                            // After the product is inserted, save the image
-                            String imagePath = "src/product_images/" + productIDString + ".jpg";
-                            saveFileToProjectFolder(selectedFile, productIDString);  // Rename and save the image
+                                saveFileToProjectFolder(selectedFile, productIDString);
 
-                            // Update the text field with the correct file path
-                            txtFilePath.setText(imagePath);
+                                String imagePath = "src/product_images/" + productIDString + ".jpg";
+                                txtFilePath.setText(imagePath);
 
-                            JOptionPane.showMessageDialog(this, "Product added successfully!");
-                            if (adminDashboard != null) {
-                                adminDashboard.refreshProducts();
+                                JOptionPane.showMessageDialog(this, "Product added successfully!");
+                                if (adminDashboard != null) {
+                                    adminDashboard.refreshProducts();
+                                }
+                                this.dispose();
+                            } else {
+                                JOptionPane.showMessageDialog(this, "Failed to add product.");
                             }
-                            this.dispose();
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Failed to add product.");
                         }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Adding Products Canceled.",
+                                "Cancellation", JOptionPane.INFORMATION_MESSAGE);
                     }
-                } else {
-                    JOptionPane.showMessageDialog(this, "Adding Products Canceled.",
-                            "Cancellation", JOptionPane.INFORMATION_MESSAGE);
                 }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
         }
     }//GEN-LAST:event_btnSubmitActionPerformed
 
@@ -255,8 +292,15 @@ public class Add_Products extends javax.swing.JFrame {
             if (!destFolder.exists()) {
                 destFolder.mkdirs();
             }
+            BufferedImage originalImage = ImageIO.read(file);
+ 
+            Image resizedImage = originalImage.getScaledInstance(250, 250, Image.SCALE_SMOOTH);
+            BufferedImage bufferedResizedImage = new BufferedImage(250, 250, BufferedImage.TYPE_INT_RGB);
 
-            // Rename the file using the generated ProductID
+            Graphics2D g = bufferedResizedImage.createGraphics();
+            g.drawImage(resizedImage, 0, 0, null);
+            g.dispose();
+
             java.io.File destFile = new java.io.File(destFolder, productId + ".jpg");
             java.nio.file.Files.copy(
                     file.toPath(),
