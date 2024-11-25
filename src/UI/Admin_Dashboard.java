@@ -20,6 +20,12 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     public Admin_Dashboard() {
         initComponents();
         loadProducts();
+        setIcon();
+    }
+    
+    private void setIcon() {
+        ImageIcon icon = new ImageIcon(getClass().getResource("/img/Shopaloo-logo.png"));
+        setIconImage(icon.getImage());
     }
     
     private void loadProducts() {
@@ -192,7 +198,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         lblWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Admin Dashboard");
+        setTitle("Admin");
         setResizable(false);
 
         MainPanel.setBackground(new java.awt.Color(248, 248, 248));

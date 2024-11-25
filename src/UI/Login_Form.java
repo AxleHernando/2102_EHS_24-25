@@ -3,8 +3,10 @@ package UI;
 import Databases.DBConnection;
 import Objects.User;
 import Objects.UserSession;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
+import javax.swing.ImageIcon;
 import java.sql.*;
 
 
@@ -14,6 +16,12 @@ public class Login_Form extends javax.swing.JFrame {
 
     private Login_Form() {
         initComponents();
+        setIcon();
+    }
+    
+    private void setIcon() {
+        ImageIcon icon = new ImageIcon(getClass().getResource("/img/Shopaloo-logo.png"));
+        setIconImage(icon.getImage());
     }
 
     public static Login_Form getInstance() {
@@ -49,7 +57,7 @@ public class Login_Form extends javax.swing.JFrame {
         tbShowPass = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Shopaloo");
+        setTitle("Log in");
         setBackground(new java.awt.Color(255, 255, 255));
         setResizable(false);
 
@@ -289,7 +297,11 @@ public class Login_Form extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            Login_Form login = getInstance();
+            ImageIcon icon = new ImageIcon(Login_Form.class.getResource("/img/Shopaloo-logo.png"));
+            Image image = icon.getImage();
+            javax.swing.UIManager.put("Frame.icon", image);
+
+            Login_Form login = Login_Form.getInstance();
             login.setVisible(true);
         });
     }

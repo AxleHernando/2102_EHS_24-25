@@ -18,6 +18,12 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     public Customer_Dashboard() {
         initComponents();
         loadProducts();
+        setIcon();
+    }
+    
+    private void setIcon() {
+        ImageIcon icon = new ImageIcon(getClass().getResource("/img/Shopaloo-logo.png"));
+        setIconImage(icon.getImage());
     }
 
     private void loadProducts() {
@@ -283,7 +289,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Shopaloo Dashboard");
+        setTitle("Shopaloo");
         setResizable(false);
 
         MainPanel.setBackground(new java.awt.Color(248, 248, 248));

@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.NumberFormat;
 import java.util.Locale;
+import javax.swing.ImageIcon;
 
 import javax.swing.JOptionPane;
 
@@ -19,6 +20,12 @@ public class Edit_Products extends javax.swing.JFrame {
         this.adminDashboard = adminDashboard;
         this.selectedProductID = productID;
         loadProductDetails(selectedProductID);
+        setIcon();
+    }
+    
+    private void setIcon() {
+        ImageIcon icon = new ImageIcon(getClass().getResource("/img/Shopaloo-logo.png"));
+        setIconImage(icon.getImage());
     }
     
     private String getProductID() {
@@ -77,6 +84,7 @@ public class Edit_Products extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         txtSupplier = new javax.swing.JTextField();
 
+        setTitle("Edit Products");
         setResizable(false);
 
         txtName.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
@@ -361,42 +369,6 @@ public class Edit_Products extends javax.swing.JFrame {
 
     }//GEN-LAST:event_txtFilePathActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Edit_Products.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Edit_Products.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Edit_Products.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Edit_Products.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                Admin_Dashboard adminDashboard = new Admin_Dashboard();
-                String testProductID = "1";
-                new Edit_Products(adminDashboard, testProductID).setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddImage;

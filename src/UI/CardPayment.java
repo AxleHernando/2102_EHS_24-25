@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.Locale; 
+import javax.swing.ImageIcon;
 
 public class CardPayment extends javax.swing.JFrame {
 
@@ -17,6 +18,12 @@ public class CardPayment extends javax.swing.JFrame {
         initComponents();
         this.totalAmount = total;
         lblTotal.setText(NumberFormat.getCurrencyInstance(new Locale("en", "PH")).format(total));
+        setIcon();
+    }
+    
+    private void setIcon() {
+        ImageIcon icon = new ImageIcon(getClass().getResource("/img/Shopaloo-logo.png"));
+        setIconImage(icon.getImage());
     }
     
     @SuppressWarnings("unchecked")
@@ -37,6 +44,8 @@ public class CardPayment extends javax.swing.JFrame {
         lblTotal = new javax.swing.JLabel();
         lblWelcome5 = new javax.swing.JLabel();
         txtExpiry = new javax.swing.JTextField();
+
+        setTitle("Card Details");
 
         btnProceed.setBackground(new java.awt.Color(153, 153, 255));
         btnProceed.setFont(new java.awt.Font("Helvetica", 1, 18)); // NOI18N
@@ -302,17 +311,6 @@ public class CardPayment extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnProceedActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new CardPayment(0.00).setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnProceed;
