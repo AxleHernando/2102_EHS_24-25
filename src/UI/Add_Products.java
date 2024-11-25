@@ -15,8 +15,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 public class Add_Products extends javax.swing.JFrame {
-    private Admin_Dashboard adminDashboard;
-    private String nextProductID = "1";
+    private final Admin_Dashboard adminDashboard;
     private java.io.File selectedFile;
 
     public Add_Products(Admin_Dashboard adminDashboard) {
@@ -30,6 +29,8 @@ public class Add_Products extends javax.swing.JFrame {
     private void initComponents() {
 
         btnViewSales = new javax.swing.JButton();
+        lblCategory = new javax.swing.JLabel();
+        txtCategory = new javax.swing.JTextField();
         lblWelcome = new javax.swing.JLabel();
         txtName = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
@@ -42,6 +43,8 @@ public class Add_Products extends javax.swing.JFrame {
         btnSubmit = new javax.swing.JButton();
         btnAddImage = new javax.swing.JButton();
         txtFilePath = new javax.swing.JTextField();
+        lblCategory1 = new javax.swing.JLabel();
+        txtCat = new javax.swing.JTextField();
 
         btnViewSales.setBackground(new java.awt.Color(153, 153, 255));
         btnViewSales.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
@@ -54,7 +57,12 @@ public class Add_Products extends javax.swing.JFrame {
             }
         });
 
-        lblWelcome.setFont(new java.awt.Font("Helvetica", 1, 26)); // NOI18N
+        lblCategory.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+        lblCategory.setText("Category");
+
+        txtCategory.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+
+        lblWelcome.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
         lblWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblWelcome.setText("Product Details");
 
@@ -107,36 +115,41 @@ public class Add_Products extends javax.swing.JFrame {
             }
         });
 
+        lblCategory1.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+        lblCategory1.setText("Category");
+
+        txtCat.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblWelcome)
-                .addGap(70, 70, 70))
             .addGroup(layout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnAddImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtFilePath))
-                    .addComponent(jLabel1)
-                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(txtPrice))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(txtStocks, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(txtDesc)
-                    .addComponent(btnSubmit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblWelcome)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(lblCategory1)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(btnAddImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtFilePath))
+                        .addComponent(jLabel1)
+                        .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+                        .addComponent(jLabel2)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel3)
+                                    .addGap(0, 0, Short.MAX_VALUE))
+                                .addComponent(txtPrice))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel4)
+                                .addComponent(txtStocks, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtDesc)
+                        .addComponent(btnSubmit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtCat)))
                 .addContainerGap(29, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -144,7 +157,7 @@ public class Add_Products extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(17, 17, 17)
                 .addComponent(lblWelcome)
-                .addGap(33, 33, 33)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -152,7 +165,7 @@ public class Add_Products extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtDesc, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(jLabel4))
@@ -160,11 +173,15 @@ public class Add_Products extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtStocks, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblCategory1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtCat, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtFilePath)
-                    .addComponent(btnAddImage, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                    .addComponent(btnAddImage, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(17, 17, 17))
         );
@@ -225,6 +242,12 @@ public class Add_Products extends javax.swing.JFrame {
                 isValid = false;
             }
         }
+        
+        if (txtCat.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Category field is required.");
+            txtCat.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255,0,0), 2));
+            isValid = false;
+        }
 
         if (selectedFile == null) {
             JOptionPane.showMessageDialog(this, "Please select an image for the product.");
@@ -233,13 +256,14 @@ public class Add_Products extends javax.swing.JFrame {
 
         if (isValid) {
             try (Connection con = DBConnection.Connect()) {
-                String query = "INSERT INTO products (Name, Description, Price, Stocks, UserID) VALUES (?, ?, ?, ?, ?)";
+                String query = "INSERT INTO products (Name, Description, Price, Stocks, UserID, Category) VALUES (?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement ps = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     ps.setString(1, txtName.getText());
                     ps.setString(2, txtDesc.getText());
                     ps.setDouble(3, Double.parseDouble(txtPrice.getText()));
                     ps.setInt(4, Integer.parseInt(txtStocks.getText()));
                     ps.setString(5, Login_Form.loggedInUserID);
+                    ps.setString(6, txtCategory.getText());
 
                 NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
                     String formattedPrice = formatter.format(Double.parseDouble(txtPrice.getText()));
@@ -248,14 +272,13 @@ public class Add_Products extends javax.swing.JFrame {
                             + "Description: " + txtDesc.getText() + "\n"
                             + "Price: " + formattedPrice + "\n"
                             + "Stocks: " + txtStocks.getText() + "\n"
+                            + "Category: " + txtCat.getText() + "\n"
                             + "Do you want to proceed?";
                     int confirm = JOptionPane.showConfirmDialog(this, message,
                             "Confirm Checkout", JOptionPane.YES_NO_OPTION,
                             JOptionPane.QUESTION_MESSAGE);
 
                     if (confirm == JOptionPane.YES_OPTION) {
-                        int rowsAffected = ps.executeUpdate();
-
                         try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                             if (generatedKeys.next()) {
                                 int productId = generatedKeys.getInt(1);
@@ -318,8 +341,8 @@ public class Add_Products extends javax.swing.JFrame {
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image Files", "jpg"));
         int returnValue = fileChooser.showOpenDialog(this);
         if (returnValue == javax.swing.JFileChooser.APPROVE_OPTION) {
-            selectedFile = fileChooser.getSelectedFile(); // Save the selected file globally
-            txtFilePath.setText(selectedFile.getAbsolutePath());  // Set file path temporarily
+            selectedFile = fileChooser.getSelectedFile();
+            txtFilePath.setText(selectedFile.getAbsolutePath()); 
         }
     }//GEN-LAST:event_btnAddImageActionPerformed
 
@@ -371,7 +394,11 @@ public class Add_Products extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel lblCategory;
+    private javax.swing.JLabel lblCategory1;
     private javax.swing.JLabel lblWelcome;
+    private javax.swing.JTextField txtCat;
+    private javax.swing.JTextField txtCategory;
     private javax.swing.JTextField txtDesc;
     private javax.swing.JTextField txtFilePath;
     private javax.swing.JTextField txtName;

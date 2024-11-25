@@ -32,7 +32,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         String loggedInUserId = getLoggedInUserID();
 
         try (Connection con = DBConnection.Connect()) {
-            String query = "SELECT p.ProductID, p.Name, p.Price, p.Stocks FROM products p JOIN users u ON p.UserID = u.UserID WHERE u.UserID = ?";
+            String query = "SELECT p.ProductID, p.Name, p.Price, p.Stocks, p.Category FROM products p JOIN users u ON p.UserID = u.UserID WHERE u.UserID = ?";
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 ps.setString(1, loggedInUserId);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -41,6 +41,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                         String name = rs.getString("Name");
                         double price = rs.getDouble("Price");
                         int stocks = rs.getInt("Stocks");
+                        String category = rs.getString("Category");
 
                         if (name == null) {
                             name = "N/A";
@@ -51,7 +52,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                         NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
                         String formattedPrice = formatter.format(price);
 
-                        model.addRow(new Object[]{productId, name, formattedPrice, stocks});
+                        model.addRow(new Object[]{productId, name, formattedPrice, stocks, category});
                     }
                 }
             }
@@ -68,11 +69,11 @@ public class Admin_Dashboard extends javax.swing.JFrame {
             String productId = Table_Products.getValueAt(selectedRow, 0).toString();
             updateProductDetails(productId);
         } else {
-            // Optionally, clear the product details if no product is selected
             lblProductName.setText("...");
             lblProductDesc.setText("");
             lblStocks.setText("Stocks: ...");
-            lblProductImage.setIcon(null); // Clear the image if no product is selected
+            lblCategory.setText("Category: ...");
+            lblProductImage.setIcon(null);
         }
     }
 
@@ -92,7 +93,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     
     private void updateProductDetails(String productId) {
         try (Connection con = DBConnection.Connect()) {
-            String query = "SELECT Name, Description, UserID, Stocks FROM products WHERE ProductID = ?";
+            String query = "SELECT Name, Description, UserID, Stocks, Category FROM products WHERE ProductID = ?";
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 ps.setString(1, productId);
                 ResultSet rs = ps.executeQuery();
@@ -100,16 +101,18 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                     String name = rs.getString("Name");
                     String description = rs.getString("Description");
                     String stocks = rs.getString("Stocks");
+                    String category = rs.getString("Category");
 
                     lblProductName.setText(name);
                     lblProductDesc.setText(description); 
                     lblStocks.setText("Stocks: " + stocks);
+                    lblCategory.setText("Category: " + category);
                     
                     BufferedImage img = loadProductImage(productId);
                     if (img != null) {
-                        lblProductImage.setIcon(new ImageIcon(img)); // Set the image icon
+                        lblProductImage.setIcon(new ImageIcon(img));
                     } else {
-                        lblProductImage.setIcon(null); // Clear if image is not found
+                        lblProductImage.setIcon(null);
                     }
                 }
             }
@@ -132,6 +135,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         lblProductDesc = new javax.swing.JTextArea();
         lblStocks = new javax.swing.JLabel();
+        lblCategory = new javax.swing.JLabel();
         btnEditProduct = new javax.swing.JButton();
         btnAddProduct = new javax.swing.JButton();
         btnRemoveProduct = new javax.swing.JButton();
@@ -151,13 +155,13 @@ public class Admin_Dashboard extends javax.swing.JFrame {
 
         Table_Products.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Name", "Price", "Stock"
+                "ID", "Name", "Price", "Stock", "Category"
             }
         ));
         Table_Products.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -183,6 +187,9 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         lblStocks.setFont(new java.awt.Font("Helvetica", 1, 14)); // NOI18N
         lblStocks.setText("...");
 
+        lblCategory.setFont(new java.awt.Font("Helvetica", 1, 14)); // NOI18N
+        lblCategory.setText("...");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -194,7 +201,8 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblStocks)
                     .addComponent(lblProductName)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblCategory))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -209,7 +217,9 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(lblStocks)
-                        .addGap(46, 46, 46))
+                        .addGap(18, 18, 18)
+                        .addComponent(lblCategory)
+                        .addGap(13, 13, 13))
                     .addComponent(lblProductImage, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -362,8 +372,14 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnEditProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditProductActionPerformed
-        Edit_Products editForm = new Edit_Products(this);
-        editForm.loadProductIDs();
+        int selectedRow = Table_Products.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a product to edit.");
+            return;
+        }
+
+        String selectedProductID = Table_Products.getValueAt(selectedRow, 0).toString();
+        Edit_Products editForm = new Edit_Products(this, selectedProductID);
         editForm.setVisible(true);
     }//GEN-LAST:event_btnEditProductActionPerformed
 
@@ -386,6 +402,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                 + "Description: " + lblProductDesc.getText() + "\n"
                 + "Price: " + Table_Products.getValueAt(selectedRow, 2).toString() + "\n"
                 + "Stocks: " + Table_Products.getValueAt(selectedRow, 3).toString() + "\n"
+                + "Category: " + Table_Products.getValueAt(selectedRow, 4).toString() + "\n"
                 + "Do you want to proceed?";
 
         int confirm = JOptionPane.showConfirmDialog(this, message,
@@ -455,6 +472,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblCategory;
     private javax.swing.JTextArea lblProductDesc;
     private javax.swing.JLabel lblProductImage;
     private javax.swing.JLabel lblProductName;

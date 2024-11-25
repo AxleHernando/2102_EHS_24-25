@@ -24,7 +24,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         Table_Products.setModel(productTableModel);
 
         try (Connection con = DBConnection.Connect()) {
-            String query = "SELECT p.ProductID, p.Name, p.Price, u.FullName FROM products p JOIN users u ON p.UserID = u.UserID WHERE u.Role = 'Admin'";
+            String query = "SELECT p.ProductID, p.Name, p.Price, u.FullName, p.Category FROM products p JOIN users u ON p.UserID = u.UserID WHERE u.Role = 'Admin'";
             try (PreparedStatement ps = con.prepareStatement(query);
                  ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -32,6 +32,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     String name = rs.getString("Name");
                     double price = rs.getDouble("Price");
                     String fullName = rs.getString("FullName");
+                    String category = rs.getString("Category");
 
                     if (name == null) {
                         name = "N/A";
@@ -46,7 +47,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
                     String formattedPrice = formatter.format(price);
 
-                    productTableModel.addRow(new Object[]{productId, name, formattedPrice, fullName});
+                    productTableModel.addRow(new Object[]{productId, name, formattedPrice, fullName, category});
                 }
             }
         } catch (Exception e) {
@@ -134,15 +135,16 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         productTableModel.setRowCount(0);
 
         try (Connection con = DBConnection.Connect()) {
-            String query = "SELECT p.ProductID, p.Name, p.Price, u.FullName "
+            String query = "SELECT p.ProductID, p.Name, p.Price, u.FullName, p.Category "
                     + "FROM products p JOIN users u ON p.UserID = u.UserID "
-                    + "WHERE u.Role = 'Admin' AND (LOWER(p.Name) LIKE ? OR LOWER(u.FullName) LIKE ? OR LOWER(p.ProductID) LIKE ?)";
+                    + "WHERE u.Role = 'Admin' AND (LOWER(p.Name) LIKE ? OR LOWER(u.FullName) LIKE ? OR LOWER(p.ProductID) LIKE ? OR LOWER(p.Category) LIKE ?)";
 
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 String searchPattern = "%" + searchText + "%";
                 ps.setString(1, searchPattern);
                 ps.setString(2, searchPattern);
                 ps.setString(3, searchPattern);
+                ps.setString(4, searchPattern);
 
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
@@ -150,11 +152,12 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                         String name = rs.getString("Name");
                         double price = rs.getDouble("Price");
                         String fullName = rs.getString("FullName");
+                        String category = rs.getString("Category");
 
                         NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
                         String formattedPrice = formatter.format(price);
 
-                        productTableModel.addRow(new Object[]{productId, name, formattedPrice, fullName});
+                        productTableModel.addRow(new Object[]{productId, name, formattedPrice, fullName, category});
                     }
                 }
             }
@@ -163,16 +166,34 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         }
     }
     
+    private String getProductCategory(String productId) {
+        String category = "";
+
+        try (Connection con = DBConnection.Connect()) {
+            String query = "SELECT Category FROM products WHERE ProductID = ?";
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                ps.setString(1, productId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    category = rs.getString("Category");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error retrieving product category: " + e.getMessage());
+        }
+        return category;
+    }
+    
     private void insertOrderIntoDatabase(String userID, String modeOfPayment) {
         try (Connection con = DBConnection.Connect()) {
-            String insertOrderQuery = "INSERT INTO orders (UserID, ProductID, Quantity, Price, ModeOfPayment) VALUES (?, ?, ?, ?, ?)";
-            String insertSalesQuery = "INSERT INTO sales (UserID, ProductID, Quantity, TotalPrice, SaleDate) VALUES (?, ?, ?, ?, NOW())";
+            String insertOrderQuery = "INSERT INTO orders (UserID, ProductID, Quantity, Price, ModeOfPayment, Category) VALUES (?, ?, ?, ?, ?, ?)";
 
             for (int i = 0; i < cartTableModel.getRowCount(); i++) {
                 String productId = cartTableModel.getValueAt(i, 0).toString();
                 int quantity = (int) cartTableModel.getValueAt(i, 2);
                 String priceString = cartTableModel.getValueAt(i, 3).toString();
                 double price = quantity * Double.parseDouble(priceString.replace("PHP ", "").replace(",", "").trim());
+                String category = getProductCategory(productId);
 
                 try (PreparedStatement ps = con.prepareStatement(insertOrderQuery)) {
                     ps.setString(1, userID);
@@ -180,14 +201,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     ps.setInt(3, quantity);
                     ps.setDouble(4, price);
                     ps.setString(5, modeOfPayment);
-                    ps.executeUpdate();
-                }
-
-                try (PreparedStatement ps = con.prepareStatement(insertSalesQuery)) {
-                    ps.setString(1, userID);
-                    ps.setString(2, productId);
-                    ps.setInt(3, quantity);
-                    ps.setDouble(4, price);
+                    ps.setString(6, category);
                     ps.executeUpdate();
                 }
             }
@@ -313,13 +327,13 @@ public class Customer_Dashboard extends javax.swing.JFrame {
 
         Table_Products.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Name", "Price", "Seller"
+                "ID", "Name", "Price", "Seller", "Category"
             }
         ));
         Table_Products.setName(""); // NOI18N
@@ -348,6 +362,11 @@ public class Customer_Dashboard extends javax.swing.JFrame {
             }
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 txtSearchMouseReleased(evt);
+            }
+        });
+        txtSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtSearchActionPerformed(evt);
             }
         });
         txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -633,11 +652,6 @@ public class Customer_Dashboard extends javax.swing.JFrame {
             cardPayment.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosed(java.awt.event.WindowEvent windowEvent) {
-                    String cardNumber = cardPayment.getCardNumber();
-                    String cardHolder = cardPayment.getCardHolder();
-                    String expiryDate = cardPayment.getExpiryDate();
-                    String cvc = cardPayment.getCVC();
-
                     insertOrderIntoDatabase(loggedInUserID, modeOfPayment);
                 }
             });
@@ -776,6 +790,10 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     private void txtSearchMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseReleased
         
     }//GEN-LAST:event_txtSearchMouseReleased
+
+    private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MainPanel;

@@ -1,8 +1,8 @@
 package UI;
 
 import Databases.DBConnection;
-import Users.User;
-import Users.UserSession;
+import Objects.User;
+import Objects.UserSession;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
 import java.sql.*;
