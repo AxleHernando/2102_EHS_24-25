@@ -21,11 +21,12 @@ public class SignUp_Form extends javax.swing.JFrame {
         txtPassword = new javax.swing.JPasswordField();
         btnSignUp = new javax.swing.JButton();
         txtUsername = new javax.swing.JTextField();
-        comboRole = new javax.swing.JComboBox<>();
         lblPassword1 = new javax.swing.JLabel();
-        txtFullName = new javax.swing.JTextField();
+        txtFirstName = new javax.swing.JTextField();
         txtPassword1 = new javax.swing.JPasswordField();
         lblPassword2 = new javax.swing.JLabel();
+        lblPassword3 = new javax.swing.JLabel();
+        txtLastName = new javax.swing.JTextField();
         btnBack = new javax.swing.JButton();
         lblWelcome = new javax.swing.JLabel();
 
@@ -58,18 +59,26 @@ public class SignUp_Form extends javax.swing.JFrame {
         });
 
         txtUsername.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-
-        comboRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Admin", "Customer" }));
+        txtUsername.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtUsernameKeyPressed(evt);
+            }
+        });
 
         lblPassword1.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
-        lblPassword1.setText("Full Name");
+        lblPassword1.setText("First Name");
 
-        txtFullName.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+        txtFirstName.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
 
         txtPassword1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
         lblPassword2.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
         lblPassword2.setText("Re-Enter Password");
+
+        lblPassword3.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+        lblPassword3.setText("Last Name");
+
+        txtLastName.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -80,21 +89,23 @@ public class SignUp_Form extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblUsername1)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(comboRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnSignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(btnSignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblUsername1))
                         .addGap(0, 23, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblPassword1)
-                            .addComponent(lblPassword2)
-                            .addComponent(lblPassword))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtFullName, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblPassword1)
+                                    .addComponent(lblPassword2)
+                                    .addComponent(lblPassword)
+                                    .addComponent(txtFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(lblPassword3)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(txtLastName)))
                             .addComponent(txtPassword1, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtPassword, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtUsername, javax.swing.GroupLayout.Alignment.LEADING))
@@ -114,15 +125,19 @@ public class SignUp_Form extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblPassword2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtPassword1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblPassword1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtFullName, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtPassword1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblPassword1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblPassword3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtLastName, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnSignUp, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-                    .addComponent(comboRole))
+                .addComponent(btnSignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(25, 25, 25))
         );
 
@@ -179,8 +194,9 @@ public class SignUp_Form extends javax.swing.JFrame {
         String username = txtUsername.getText();
         String password = new String(txtPassword.getPassword());
         String password1 = new String(txtPassword1.getPassword());
-        String fullName = txtFullName.getText();
-        String role = (String) comboRole.getSelectedItem();
+        String firstName = txtFirstName.getText();
+        String lastName = txtLastName.getText();
+        String fullName = firstName + " " + lastName;
 
         if (username.isEmpty() || password.isEmpty() || fullName.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -198,7 +214,7 @@ public class SignUp_Form extends javax.swing.JFrame {
             PreparedStatement ps = con.prepareStatement(insertUserQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, username);
             ps.setString(2, password);
-            ps.setString(3, role);
+            ps.setString(3, "Customer");
             ps.setString(4, fullName);
             ps.executeUpdate();
 
@@ -219,6 +235,13 @@ public class SignUp_Form extends javax.swing.JFrame {
         login.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnBackActionPerformed
+
+    private void txtUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsernameKeyPressed
+        if (evt.getKeyChar() == ' ') {
+            evt.consume();
+            JOptionPane.showMessageDialog(SignUp_Form.this, "Spaces are not allowed in the username.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_txtUsernameKeyPressed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -256,14 +279,15 @@ public class SignUp_Form extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnSignUp;
-    private javax.swing.JComboBox<String> comboRole;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblPassword;
     private javax.swing.JLabel lblPassword1;
     private javax.swing.JLabel lblPassword2;
+    private javax.swing.JLabel lblPassword3;
     private javax.swing.JLabel lblUsername1;
     private javax.swing.JLabel lblWelcome;
-    private javax.swing.JTextField txtFullName;
+    private javax.swing.JTextField txtFirstName;
+    private javax.swing.JTextField txtLastName;
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JPasswordField txtPassword1;
     private javax.swing.JTextField txtUsername;

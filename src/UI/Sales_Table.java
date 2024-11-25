@@ -67,7 +67,7 @@ public class Sales_Table extends javax.swing.JFrame {
                     + "FROM orders o "
                     + "JOIN products p ON o.ProductID = p.ProductID "
                     + "JOIN users u ON o.UserID = u.UserID "
-                    + "WHERE u.Role = 'Admin' AND (LOWER(p.Name) LIKE ? OR LOWER(p.Category) LIKE ? OR LOWER(u.FullName) LIKE ?)";
+                    + "WHERE LOWER(p.Name) LIKE ? OR LOWER(p.Category) LIKE ? OR LOWER(u.FullName) LIKE ?";
 
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 String searchPattern = "%" + searchText + "%";

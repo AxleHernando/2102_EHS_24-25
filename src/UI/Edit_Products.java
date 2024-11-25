@@ -25,10 +25,6 @@ public class Edit_Products extends javax.swing.JFrame {
         return this.selectedProductID;
     }
     
-    private String getLoggedInUserID() {
-        return Login_Form.loggedInUserID;
-    }
-    
     private void loadProductDetails(String productID) {
         try (Connection con = DBConnection.Connect()) {
             String query = "SELECT * FROM products WHERE ProductID = ?";
@@ -36,6 +32,7 @@ public class Edit_Products extends javax.swing.JFrame {
                 ps.setString(1, productID);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
+                        txtSupplier.setText(rs.getString("SupplierName"));
                         txtName.setText(rs.getString("Name"));
                         txtDesc.setText(rs.getString("Description"));
                         txtPrice.setText(String.valueOf(rs.getDouble("Price")));
@@ -64,7 +61,6 @@ public class Edit_Products extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lblWelcome = new javax.swing.JLabel();
         txtName = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         txtDesc = new javax.swing.JTextField();
@@ -78,12 +74,10 @@ public class Edit_Products extends javax.swing.JFrame {
         txtFilePath = new javax.swing.JTextField();
         txtCategory = new javax.swing.JTextField();
         lblCategory = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        txtSupplier = new javax.swing.JTextField();
 
         setResizable(false);
-
-        lblWelcome.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
-        lblWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblWelcome.setText("Product Details");
 
         txtName.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
 
@@ -141,6 +135,11 @@ public class Edit_Products extends javax.swing.JFrame {
         lblCategory.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
         lblCategory.setText("Category");
 
+        jLabel5.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+        jLabel5.setText("Supplier Name");
+
+        txtSupplier.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -148,6 +147,7 @@ public class Edit_Products extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel5)
                     .addComponent(lblCategory)
                     .addComponent(jLabel2)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -162,22 +162,24 @@ public class Edit_Products extends javax.swing.JFrame {
                             .addComponent(txtStocks, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(txtDesc)
                     .addComponent(btnSubmit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblWelcome)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnAddImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtFilePath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(txtCategory)
                     .addComponent(jLabel1)
-                    .addComponent(txtName))
+                    .addComponent(txtName)
+                    .addComponent(txtSupplier))
                 .addContainerGap(29, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(lblWelcome)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addContainerGap(19, Short.MAX_VALUE)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -201,7 +203,7 @@ public class Edit_Products extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnAddImage, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtFilePath, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(17, 17, 17))
         );
@@ -218,6 +220,7 @@ public class Edit_Products extends javax.swing.JFrame {
         txtPrice.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
         txtStocks.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
         txtCategory.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
+        txtSupplier.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
 
         boolean isValid = true;
 
@@ -266,6 +269,12 @@ public class Edit_Products extends javax.swing.JFrame {
             txtCategory.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
             isValid = false;
         }
+        
+        if (txtSupplier.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Supplier Name field is required.");
+            txtSupplier.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+            isValid = false;
+        }
 
         if (selectedID == null) {
             JOptionPane.showMessageDialog(this, "Please select a product to update.");
@@ -274,19 +283,21 @@ public class Edit_Products extends javax.swing.JFrame {
 
         if (isValid) {
             try (Connection con = DBConnection.Connect()) {
-                String query = "UPDATE products SET Name = ?, Description = ?, Price = ?, Stocks = ?, Category = ? WHERE ProductID = ?";
+                String query = "UPDATE products SET Name = ?, Description = ?, Price = ?, Stocks = ?, Category = ?, SupplierName = ? WHERE ProductID = ?";
                 try (PreparedStatement ps = con.prepareStatement(query)) {
                     ps.setString(1, txtName.getText());
                     ps.setString(2, txtDesc.getText());
                     ps.setDouble(3, Double.parseDouble(txtPrice.getText()));
                     ps.setInt(4, Integer.parseInt(txtStocks.getText()));
                     ps.setString(5, txtCategory.getText());
-                    ps.setString(6, selectedID);
+                    ps.setString(6, txtSupplier.getText());
+                    ps.setString(7, selectedID);
 
                     NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
                     String formattedPrice = formatter.format(Double.parseDouble(txtPrice.getText()));
 
-                    String message = "Name: " + txtName.getText() + "\n"
+                    String message = "Supplier Name: " + txtSupplier.getText() + "\n"
+                            + "Product Name: " + txtName.getText() + "\n"
                             + "Description: " + txtDesc.getText() + "\n"
                             + "Price: " + formattedPrice + "\n"
                             + "Stocks: " + txtStocks.getText() + "\n"
@@ -394,13 +405,14 @@ public class Edit_Products extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel lblCategory;
-    private javax.swing.JLabel lblWelcome;
     private javax.swing.JTextField txtCategory;
     private javax.swing.JTextField txtDesc;
     private javax.swing.JTextField txtFilePath;
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtPrice;
     private javax.swing.JTextField txtStocks;
+    private javax.swing.JTextField txtSupplier;
     // End of variables declaration//GEN-END:variables
 }

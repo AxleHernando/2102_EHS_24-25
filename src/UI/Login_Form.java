@@ -210,7 +210,7 @@ public class Login_Form extends javax.swing.JFrame {
                 String storedPassword = rs.getString("Password");
                 if (storedPassword.equals(password)) {
                     loggedInUserID = rs.getString("UserID");
-                    JOptionPane.showMessageDialog(this, "Welcome, " + username + "!", "Login Successful", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Welcome, " + rs.getString("FullName") + "!", "Login Successful", JOptionPane.INFORMATION_MESSAGE);
                     String role = rs.getString("Role");
                     switch (role) {
                         case "Customer":

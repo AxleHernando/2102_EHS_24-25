@@ -1,6 +1,7 @@
 package UI;
 
 import Databases.DBConnection;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.sql.Connection;
@@ -21,39 +22,29 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         loadProducts();
     }
     
-    private String getLoggedInUserID() {
-        return Login_Form.loggedInUserID;
-    }
-    
     private void loadProducts() {
         DefaultTableModel model = (DefaultTableModel) Table_Products.getModel();
         model.setRowCount(0);
 
-        String loggedInUserId = getLoggedInUserID();
-
         try (Connection con = DBConnection.Connect()) {
-            String query = "SELECT p.ProductID, p.Name, p.Price, p.Stocks, p.Category FROM products p JOIN users u ON p.UserID = u.UserID WHERE u.UserID = ?";
-            try (PreparedStatement ps = con.prepareStatement(query)) {
-                ps.setString(1, loggedInUserId);
-                try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        String productId = rs.getString("ProductID");
-                        String name = rs.getString("Name");
-                        double price = rs.getDouble("Price");
-                        int stocks = rs.getInt("Stocks");
-                        String category = rs.getString("Category");
+            String query = "SELECT ProductID, Name, Price, Stocks, Category, SupplierName FROM products";
+            try (PreparedStatement ps = con.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String productId = rs.getString("ProductID");
+                    String name = rs.getString("Name");
+                    double price = rs.getDouble("Price");
+                    int stocks = rs.getInt("Stocks");
+                    String category = rs.getString("Category");
+                    String supplier = rs.getString("SupplierName");
 
-                        if (name == null) {
-                            name = "N/A";
-                        }
-                        
-                        updateProductDetails(productId);
-
-                        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
-                        String formattedPrice = formatter.format(price);
-
-                        model.addRow(new Object[]{productId, name, formattedPrice, stocks, category});
+                    if (name == null || name.isEmpty()) {
+                        name = "N/A";
                     }
+
+                    NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
+                    String formattedPrice = formatter.format(price);
+
+                    model.addRow(new Object[]{productId, name, formattedPrice, stocks, category, supplier});
                 }
             }
         } catch (Exception e) {
@@ -61,8 +52,56 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         }
     }
     
+    private void searchProducts() {
+        productTableModel = (DefaultTableModel) Table_Products.getModel();
+        productTableModel.setRowCount(0);
+
+        String searchText = txtSearch.getText().toLowerCase();
+
+        try (Connection con = DBConnection.Connect()) {
+            String query = "SELECT ProductID, Name, Price, Stocks, Category, SupplierName FROM products "
+                    + "WHERE LOWER(Name) LIKE ? OR LOWER(Category) LIKE ? OR LOWER(SupplierName) LIKE ?";
+            
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                String searchPattern = "%" + searchText + "%";
+                ps.setString(1, searchPattern);
+                ps.setString(2, searchPattern);
+                ps.setString(3, searchPattern);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String productId = rs.getString("ProductID");
+                        String name = rs.getString("Name");
+                        double price = rs.getDouble("Price");
+                        int stocks = rs.getInt("Stocks");
+                        String category = rs.getString("Category");
+                        String supplier = rs.getString("SupplierName");
+
+                        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
+                        String formattedPrice = formatter.format(price);
+
+                        productTableModel.addRow(new Object[]{productId, name, formattedPrice, stocks, category, supplier});
+                    }
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error searching products: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void clearProductDetails() {
+        lblProductName.setText("...");
+        lblProductDesc.setText("");
+        lblStocks.setText("Stocks: ...");
+        lblCategory.setText("Category: ...");
+        lblSupplier.setText("Supplier: ...");
+        lblProductImage.setIcon(null);
+    }
+    
     public void refreshProducts() {
         loadProducts();
+        txtSearch.setText("");
+        clearProductDetails();
         
         int selectedRow = Table_Products.getSelectedRow();
         if (selectedRow != -1) {
@@ -93,7 +132,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     
     private void updateProductDetails(String productId) {
         try (Connection con = DBConnection.Connect()) {
-            String query = "SELECT Name, Description, UserID, Stocks, Category FROM products WHERE ProductID = ?";
+            String query = "SELECT Name, Description, Stocks, Category, SupplierName FROM products WHERE ProductID = ?";
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 ps.setString(1, productId);
                 ResultSet rs = ps.executeQuery();
@@ -102,11 +141,13 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                     String description = rs.getString("Description");
                     String stocks = rs.getString("Stocks");
                     String category = rs.getString("Category");
+                    String supplier = rs.getString("SupplierName");
 
                     lblProductName.setText(name);
                     lblProductDesc.setText(description); 
                     lblStocks.setText("Stocks: " + stocks);
                     lblCategory.setText("Category: " + category);
+                    lblSupplier.setText("Supplier: " + supplier);
                     
                     BufferedImage img = loadProductImage(productId);
                     if (img != null) {
@@ -136,6 +177,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         lblProductDesc = new javax.swing.JTextArea();
         lblStocks = new javax.swing.JLabel();
         lblCategory = new javax.swing.JLabel();
+        lblSupplier = new javax.swing.JLabel();
         btnEditProduct = new javax.swing.JButton();
         btnAddProduct = new javax.swing.JButton();
         btnRemoveProduct = new javax.swing.JButton();
@@ -143,6 +185,8 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         btnViewSales = new javax.swing.JButton();
         lblWelcome1 = new javax.swing.JLabel();
         btnRefresh = new javax.swing.JButton();
+        txtSearch = new javax.swing.JTextField();
+        lblSearch = new javax.swing.JLabel();
 
         lblWelcome.setFont(new java.awt.Font("Helvetica", 1, 26)); // NOI18N
         lblWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -155,13 +199,13 @@ public class Admin_Dashboard extends javax.swing.JFrame {
 
         Table_Products.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Name", "Price", "Stock", "Category"
+                "ID", "Name", "Price", "Stock", "Category", "Supplier"
             }
         ));
         Table_Products.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -190,6 +234,9 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         lblCategory.setFont(new java.awt.Font("Helvetica", 1, 14)); // NOI18N
         lblCategory.setText("...");
 
+        lblSupplier.setFont(new java.awt.Font("Helvetica", 1, 14)); // NOI18N
+        lblSupplier.setText("...");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -202,7 +249,8 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                     .addComponent(lblStocks)
                     .addComponent(lblProductName)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblCategory))
+                    .addComponent(lblCategory)
+                    .addComponent(lblSupplier))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -216,8 +264,10 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblStocks)
-                        .addGap(18, 18, 18)
+                        .addComponent(lblSupplier)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblStocks, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(lblCategory)
                         .addGap(13, 13, 13))
                     .addComponent(lblProductImage, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -293,6 +343,37 @@ public class Admin_Dashboard extends javax.swing.JFrame {
             }
         });
 
+        txtSearch.setText("Search");
+        txtSearch.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtSearchMouseClicked(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                txtSearchMouseExited(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                txtSearchMouseReleased(evt);
+            }
+        });
+        txtSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtSearchActionPerformed(evt);
+            }
+        });
+        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchKeyPressed(evt);
+            }
+        });
+
+        lblSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Search.png"))); // NOI18N
+        lblSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblSearch.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblSearchMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(MainPanel);
         MainPanel.setLayout(MainPanelLayout);
         MainPanelLayout.setHorizontalGroup(
@@ -317,6 +398,10 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                             .addGroup(MainPanelLayout.createSequentialGroup()
                                 .addComponent(lblWelcome1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblSearch)
+                                .addGap(20, 20, 20)
                                 .addComponent(btnRefresh)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -325,12 +410,19 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         MainPanelLayout.setVerticalGroup(
             MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(MainPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblWelcome1)
-                    .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnRefresh)))
+                    .addGroup(MainPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblWelcome1)
+                            .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnRefresh))))
+                    .addGroup(MainPanelLayout.createSequentialGroup()
+                        .addGap(11, 11, 11)
+                        .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblSearch))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -460,6 +552,32 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         refreshProducts();
     }//GEN-LAST:event_btnRefreshActionPerformed
 
+    private void txtSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseClicked
+        txtSearch.setText("");
+    }//GEN-LAST:event_txtSearchMouseClicked
+
+    private void txtSearchMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseExited
+
+    }//GEN-LAST:event_txtSearchMouseExited
+
+    private void txtSearchMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtSearchMouseReleased
+
+    }//GEN-LAST:event_txtSearchMouseReleased
+
+    private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
+        
+    }//GEN-LAST:event_txtSearchActionPerformed
+
+    private void txtSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            searchProducts();
+        }
+    }//GEN-LAST:event_txtSearchKeyPressed
+
+    private void lblSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSearchMouseClicked
+        searchProducts();
+    }//GEN-LAST:event_lblSearchMouseClicked
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MainPanel;
     private javax.swing.JTable Table_Products;
@@ -476,8 +594,11 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     private javax.swing.JTextArea lblProductDesc;
     private javax.swing.JLabel lblProductImage;
     private javax.swing.JLabel lblProductName;
+    private javax.swing.JLabel lblSearch;
     private javax.swing.JLabel lblStocks;
+    private javax.swing.JLabel lblSupplier;
     private javax.swing.JLabel lblWelcome;
     private javax.swing.JLabel lblWelcome1;
+    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }

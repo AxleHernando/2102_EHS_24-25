@@ -8,8 +8,7 @@ import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.sql.SQLException;
 import javax.imageio.ImageIO;
 
 import javax.swing.JOptionPane;
@@ -31,7 +30,6 @@ public class Add_Products extends javax.swing.JFrame {
         btnViewSales = new javax.swing.JButton();
         lblCategory = new javax.swing.JLabel();
         txtCategory = new javax.swing.JTextField();
-        lblWelcome = new javax.swing.JLabel();
         txtName = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         txtDesc = new javax.swing.JTextField();
@@ -45,6 +43,8 @@ public class Add_Products extends javax.swing.JFrame {
         txtFilePath = new javax.swing.JTextField();
         lblCategory1 = new javax.swing.JLabel();
         txtCat = new javax.swing.JTextField();
+        txtSupplier = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
 
         btnViewSales.setBackground(new java.awt.Color(153, 153, 255));
         btnViewSales.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
@@ -61,10 +61,6 @@ public class Add_Products extends javax.swing.JFrame {
         lblCategory.setText("Category");
 
         txtCategory.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
-
-        lblWelcome.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
-        lblWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblWelcome.setText("Product Details");
 
         txtName.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
 
@@ -120,43 +116,50 @@ public class Add_Products extends javax.swing.JFrame {
 
         txtCat.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
 
+        txtSupplier.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+
+        jLabel5.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
+        jLabel5.setText("Supplier Name");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblWelcome)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(lblCategory1)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(btnAddImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtFilePath))
-                        .addComponent(jLabel1)
-                        .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
-                        .addComponent(jLabel2)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel3)
-                                    .addGap(0, 0, Short.MAX_VALUE))
-                                .addComponent(txtPrice))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel4)
-                                .addComponent(txtStocks, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addComponent(txtDesc)
-                        .addComponent(btnSubmit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(txtCat)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel5)
+                    .addComponent(lblCategory1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnAddImage, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtFilePath))
+                    .addComponent(jLabel1)
+                    .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+                    .addComponent(jLabel2)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(txtPrice))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(txtStocks, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(txtDesc)
+                    .addComponent(btnSubmit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtCat)
+                    .addComponent(txtSupplier))
                 .addContainerGap(29, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(lblWelcome)
+                .addContainerGap(19, Short.MAX_VALUE)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -177,7 +180,7 @@ public class Add_Products extends javax.swing.JFrame {
                 .addComponent(lblCategory1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtCat, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtFilePath)
                     .addComponent(btnAddImage, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -200,6 +203,7 @@ public class Add_Products extends javax.swing.JFrame {
         txtPrice.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
         txtStocks.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
         txtFilePath.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
+        txtSupplier.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 1));
 
         boolean isValid = true;
 
@@ -248,6 +252,12 @@ public class Add_Products extends javax.swing.JFrame {
             txtCat.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255,0,0), 2));
             isValid = false;
         }
+        
+        if (txtSupplier.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Supplier Name field is required.");
+            txtCat.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 0), 2));
+            isValid = false;
+        }
 
         if (selectedFile == null) {
             JOptionPane.showMessageDialog(this, "Please select an image for the product.");
@@ -256,54 +266,38 @@ public class Add_Products extends javax.swing.JFrame {
 
         if (isValid) {
             try (Connection con = DBConnection.Connect()) {
-                String query = "INSERT INTO products (Name, Description, Price, Stocks, UserID, Category) VALUES (?, ?, ?, ?, ?, ?)";
+                String query = "INSERT INTO products (Name, Description, Price, Stocks, Category, SupplierName) VALUES (?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement ps = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     ps.setString(1, txtName.getText());
                     ps.setString(2, txtDesc.getText());
                     ps.setDouble(3, Double.parseDouble(txtPrice.getText()));
                     ps.setInt(4, Integer.parseInt(txtStocks.getText()));
-                    ps.setString(5, Login_Form.loggedInUserID);
-                    ps.setString(6, txtCategory.getText());
+                    ps.setString(5, txtCat.getText());
+                    ps.setString(6, txtSupplier.getText());
 
-                NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
-                    String formattedPrice = formatter.format(Double.parseDouble(txtPrice.getText()));
-
-                    String message = "Name: " + txtName.getText() + "\n"
-                            + "Description: " + txtDesc.getText() + "\n"
-                            + "Price: " + formattedPrice + "\n"
-                            + "Stocks: " + txtStocks.getText() + "\n"
-                            + "Category: " + txtCat.getText() + "\n"
-                            + "Do you want to proceed?";
-                    int confirm = JOptionPane.showConfirmDialog(this, message,
-                            "Confirm Checkout", JOptionPane.YES_NO_OPTION,
-                            JOptionPane.QUESTION_MESSAGE);
-
-                    if (confirm == JOptionPane.YES_OPTION) {
+                    int rowsAffected = ps.executeUpdate();
+                    if (rowsAffected > 0) {
                         try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                             if (generatedKeys.next()) {
                                 int productId = generatedKeys.getInt(1);
                                 String productIDString = String.valueOf(productId);
-
                                 saveFileToProjectFolder(selectedFile, productIDString);
-
-                                String imagePath = "src/product_images/" + productIDString + ".jpg";
-                                txtFilePath.setText(imagePath);
-
                                 JOptionPane.showMessageDialog(this, "Product added successfully!");
-                                if (adminDashboard != null) {
-                                    adminDashboard.refreshProducts();
-                                }
+                                adminDashboard.refreshProducts();
                                 this.dispose();
                             } else {
-                                JOptionPane.showMessageDialog(this, "Failed to add product.");
+                                JOptionPane.showMessageDialog(this, "Failed to retrieve product ID.");
                             }
                         }
                     } else {
-                        JOptionPane.showMessageDialog(this, "Adding Products Canceled.",
-                                "Cancellation", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "No rows affected. Insert failed.");
                     }
                 }
+            } catch (SQLException e) {
+                e.printStackTrace(); // Print stack trace for debugging
+                JOptionPane.showMessageDialog(this, "SQL Error: " + e.getMessage());
             } catch (Exception e) {
+                e.printStackTrace(); // Print stack trace for debugging
                 JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
             }
         }
@@ -316,7 +310,7 @@ public class Add_Products extends javax.swing.JFrame {
                 destFolder.mkdirs();
             }
             BufferedImage originalImage = ImageIO.read(file);
- 
+
             Image resizedImage = originalImage.getScaledInstance(250, 250, Image.SCALE_SMOOTH);
             BufferedImage bufferedResizedImage = new BufferedImage(250, 250, BufferedImage.TYPE_INT_RGB);
 
@@ -325,11 +319,7 @@ public class Add_Products extends javax.swing.JFrame {
             g.dispose();
 
             java.io.File destFile = new java.io.File(destFolder, productId + ".jpg");
-            java.nio.file.Files.copy(
-                    file.toPath(),
-                    destFile.toPath(),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING
-            );
+            ImageIO.write(bufferedResizedImage, "jpg", destFile);
             JOptionPane.showMessageDialog(this, "Image saved as: " + destFile.getAbsolutePath());
         } catch (java.io.IOException ex) {
             JOptionPane.showMessageDialog(this, "Error saving file: " + ex.getMessage());
@@ -394,9 +384,9 @@ public class Add_Products extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel lblCategory;
     private javax.swing.JLabel lblCategory1;
-    private javax.swing.JLabel lblWelcome;
     private javax.swing.JTextField txtCat;
     private javax.swing.JTextField txtCategory;
     private javax.swing.JTextField txtDesc;
@@ -404,5 +394,6 @@ public class Add_Products extends javax.swing.JFrame {
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtPrice;
     private javax.swing.JTextField txtStocks;
+    private javax.swing.JTextField txtSupplier;
     // End of variables declaration//GEN-END:variables
 }

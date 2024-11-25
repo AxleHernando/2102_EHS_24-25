@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 25, 2024 at 06:19 AM
+-- Generation Time: Nov 25, 2024 at 01:29 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,8 +43,7 @@ CREATE TABLE `cardpayment` (
 --
 
 INSERT INTO `cardpayment` (`CardID`, `UserID`, `CardNo`, `CVC`, `CardHolder`, `Expiry`, `Payment`, `TransactionDate`) VALUES
-(1, 14, '1234567891234567', '123', 'Bimbi', '11/27', 220000.00, '2024-11-24 14:00:17'),
-(2, 7, '1111222233334444', '123', 'Axle Hernando', '11/25', 1600.00, '2024-11-25 13:06:13');
+(1, 20, '3726459183721947', '123', 'Jaydee', '09/11', 50400.00, '2024-11-25 19:46:54');
 
 -- --------------------------------------------------------
 
@@ -64,10 +63,8 @@ CREATE TABLE `cashpayment` (
 --
 
 INSERT INTO `cashpayment` (`CashID`, `UserID`, `CashTendered`, `TransactionDate`) VALUES
-(1, 12, 240000.00, '2024-11-24 16:06:05'),
-(2, 12, 120.00, '2024-11-25 12:48:19'),
-(3, 7, 300.00, '2024-11-25 13:06:26'),
-(4, 9, 860.00, '2024-11-25 13:06:56');
+(1, 12, 50500.00, '2024-11-25 19:28:49'),
+(2, 12, 0.00, '2024-11-25 19:30:02');
 
 -- --------------------------------------------------------
 
@@ -91,11 +88,11 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`OrderID`, `UserID`, `ProductID`, `Quantity`, `OrderDate`, `Price`, `ModeOfPayment`, `Category`) VALUES
-(1, 12, 20, 2, '2024-11-25 04:48:18', 60.00, 'Cash On Delivery', 'Hygiene'),
-(2, 7, 23, 4, '2024-11-25 05:06:14', 1600.00, 'Card Payment', 'Clothes'),
-(3, 7, 26, 1, '2024-11-25 05:06:25', 150.00, 'Cash On Delivery', 'Clothes'),
-(4, 9, 32, 2, '2024-11-25 05:06:55', 400.00, 'Cash On Delivery', 'Kitchen'),
-(5, 9, 20, 1, '2024-11-25 05:06:55', 30.00, 'Cash On Delivery', 'Hygiene');
+(1, 12, 1, 1, '2024-11-25 11:30:02', 50000.00, 'Cash On Delivery', 'Gadgets'),
+(2, 12, 37, 1, '2024-11-25 11:30:02', 500.00, 'Cash On Delivery', 'Gaming'),
+(3, 20, 14, 5, '2024-11-25 11:46:55', 100.00, 'Card Payment', 'Hygiene'),
+(4, 20, 1, 1, '2024-11-25 11:46:55', 50000.00, 'Card Payment', 'Gadgets'),
+(5, 20, 25, 1, '2024-11-25 11:46:56', 300.00, 'Card Payment', 'Clothes');
 
 -- --------------------------------------------------------
 
@@ -109,40 +106,40 @@ CREATE TABLE `products` (
   `Name` varchar(255) DEFAULT NULL,
   `Description` varchar(255) DEFAULT NULL,
   `Price` decimal(10,2) DEFAULT NULL,
-  `UserID` int(11) DEFAULT NULL,
-  `Stocks` int(11) DEFAULT NULL
+  `Stocks` int(11) DEFAULT NULL,
+  `SupplierName` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`ProductID`, `Category`, `Name`, `Description`, `Price`, `UserID`, `Stocks`) VALUES
-(1, 'Gadgets', 'Laptop', 'High-End Gaming Laptop for Gamers', 50000.00, 6, 10),
-(2, 'Gadgets', 'iPhone', 'Newly Launched High-End Mobile Phone', 40000.00, 6, 10),
-(3, 'Gadgets', 'PlayStation 5', 'Next-Gen Gaming Console', 30000.00, 6, 10),
-(4, 'Gadgets', 'Nintendo Switch', 'A Versatile Gaming Console', 20000.00, 6, 10),
-(6, 'Gadgets', 'AirPods', 'Wireless Bluetooth EarBuds designed by Apple', 15000.00, 6, 10),
-(14, 'Hygiene', 'Tissue', 'All Around Hygienic Tissue', 20.00, 15, 200),
-(18, 'Hygiene', 'Toothbrush ', 'Soft-Bristled For Gentle Cleaning', 30.00, 15, 500),
-(19, 'Hygiene', 'Comb', 'Suitable For All Hair Types', 50.00, 15, 4000),
-(20, 'Hygiene', 'Soap', 'Moisturizing And Nourishing', 30.00, 15, 300),
-(21, 'Hygiene', 'Nailcutter', 'Maintain Clean And Healthy Nails', 45.00, 15, 300),
-(22, 'Clothes', 'Coats', 'Stay Warm And Stylish', 500.00, 16, 1000),
-(23, 'Clothes', 'T-Shirts', 'Soft, Breathable Fabrics', 400.00, 16, 5000),
-(24, 'Clothes', 'Shorts', 'Comfort In Every Stitch', 450.00, 16, 5000),
-(25, 'Clothes', 'Underwear', 'Variety Of Styles And Size', 300.00, 16, 7000),
-(26, 'Clothes', 'Leggings', 'Soft And Seamless Construction', 150.00, 16, 4000),
-(27, 'Appliances', 'Refrigerator', 'Rapid Cooling Technology ', 1000.00, 17, 15000),
-(28, 'Appliances', 'Washing Machine', 'Stain Free, Stress Free', 1400.00, 17, 1200),
-(29, 'Appliances', 'Vacuum Cleaner', 'Powerful Suction, Quiet Operation', 1500.00, 17, 3000),
-(30, 'Appliances', 'Air Conditioning', 'Cooling Comfort, Effortless Convience', 30000.00, 17, 500),
-(31, 'Appliances', 'Televisions', 'Experience Stunning Picture Quality ', 30000.00, 17, 2000),
-(32, 'Kitchen', 'Pots', 'Cook With Confindence Everytime', 200.00, 18, 500),
-(33, 'Kitchen', 'Whisk ', 'Mix, Blend, And Stir With Ease', 100.00, 18, 500),
-(34, 'Kitchen', 'Graters', 'Precision Grating For Home Cooks', 400.00, 18, 300),
-(35, 'Kitchen', 'Canisters', 'Store, Organize And Preserve', 300.00, 18, 20),
-(36, 'Kitchen', 'Bowls', 'Versatile And Durable', 200.00, 18, 100);
+INSERT INTO `products` (`ProductID`, `Category`, `Name`, `Description`, `Price`, `Stocks`, `SupplierName`) VALUES
+(1, 'Gadgets', 'Laptop', 'High-End Gaming Laptop for Gamers', 50000.00, 8, 'Linux Adona'),
+(2, 'Gadgets', 'iPhone', 'Newly Launched High-End Mobile Phone', 40000.00, 10, 'Linux Adona'),
+(3, 'Gadgets', 'PlayStation 5', 'Next-Gen Gaming Console', 30000.00, 10, 'Linux Adona'),
+(4, 'Gadgets', 'Nintendo Switch', 'A Versatile Gaming Console', 20000.00, 10, 'Linux Adona'),
+(14, 'Hygiene', 'Tissue', 'All Around Hygienic Tissue', 20.00, 195, 'Xyreel Laguras'),
+(18, 'Hygiene', 'Toothbrush ', 'Soft-Bristled For Gentle Cleaning', 30.00, 500, 'Xyreel Laguras'),
+(19, 'Hygiene', 'Comb', 'Suitable For All Hair Types', 50.00, 4000, 'Xyreel Laguras'),
+(20, 'Hygiene', 'Soap', 'Moisturizing And Nourishing', 30.00, 300, 'Xyreel Laguras'),
+(21, 'Hygiene', 'Nailcutter', 'Maintain Clean And Healthy Nails', 45.00, 300, 'Xyreel Laguras'),
+(22, 'Clothes', 'Coats', 'Stay Warm And Stylish', 500.00, 1000, 'Rome Dyanne Salvid'),
+(23, 'Clothes', 'T-Shirts', 'Soft, Breathable Fabrics', 400.00, 5000, 'Rome Dyanne Salvid'),
+(24, 'Clothes', 'Shorts', 'Comfort In Every Stitch', 450.00, 5000, 'Rome Dyanne Salvid'),
+(25, 'Clothes', 'Underwear', 'Variety Of Styles And Size', 300.00, 6999, 'Rome Dyanne Salvid'),
+(26, 'Clothes', 'Leggings', 'Soft And Seamless Construction', 150.00, 4000, 'Rome Dyanne Salvid'),
+(27, 'Appliances', 'Refrigerator', 'Rapid Cooling Technology ', 1000.00, 15000, 'Maricris Barcelon'),
+(28, 'Appliances', 'Washing Machine', 'Stain Free, Stress Free', 1400.00, 1200, 'Jan Emmanuel Formentos'),
+(29, 'Appliances', 'Vacuum Cleaner', 'Powerful Suction, Quiet Operation', 1500.00, 3000, 'Maricris Barcelon'),
+(30, 'Appliances', 'Air Conditioning', 'Cooling Comfort, Effortless Convience', 30000.00, 500, 'Maricris Barcelon'),
+(31, 'Appliances', 'Televisions', 'Experience Stunning Picture Quality ', 30000.00, 2000, 'Maricris Barcelon'),
+(32, 'Kitchen', 'Pots', 'Cook With Confindence Everytime', 200.00, 500, 'Djanisse Villaflor'),
+(33, 'Kitchen', 'Whisk ', 'Mix, Blend, And Stir With Ease', 100.00, 500, 'Djanisse Villaflor'),
+(34, 'Kitchen', 'Graters', 'Precision Grating For Home Cooks', 400.00, 300, 'Djanisse Villaflor'),
+(35, 'Kitchen', 'Canisters', 'Store, Organize And Preserve', 300.00, 20, 'Djanisse Villaflor'),
+(36, 'Kitchen', 'Bowls', 'Versatile And Durable', 200.00, 100, 'Djanisse Villaflor'),
+(37, 'Gaming', 'Keyboard', 'Fast Typing for Gamers', 500.00, 29, 'Hanns Donor');
 
 -- --------------------------------------------------------
 
@@ -164,18 +161,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`UserID`, `Username`, `Password`, `Role`, `CreatedAt`, `FullName`) VALUES
-(6, 'linuxadona', 'admin123', 'Admin', '2024-11-20 10:53:58', 'Linux Mandrake Adona'),
-(7, 'axlehernando', 'cust123', 'Customer', '2024-11-20 10:56:36', 'Axle Hernando'),
-(9, 'kayemacalalad', '12345678', 'Customer', '2024-11-23 06:13:03', 'Kaye Macalalad'),
-(10, 'kristinegandaa', 'kristine03', 'Customer', '2024-11-23 07:07:32', 'kristine de torres'),
-(11, 'felmaneleponga', 'felman123', 'Customer', '2024-11-24 05:50:57', 'Felman Eleponga'),
-(12, 'aeron', 'aeron123', 'Customer', '2024-11-24 05:53:05', 'Aeron Salanguit'),
-(13, 'millanabrenica', 'millan123', 'Admin', '2024-11-24 05:57:13', 'Millan Bimbi'),
-(14, 'millanabrenics', 'millan123', 'Customer', '2024-11-24 05:57:43', 'millan bimbi'),
-(15, 'xyreel', 'xy123', 'Admin', '2024-11-24 08:26:01', 'Xyreel Laguras'),
-(16, 'rome', 'rome123', 'Admin', '2024-11-24 08:54:24', 'Rome Dyanne Salvid'),
-(17, 'Maricris', 'mari123', 'Admin', '2024-11-24 09:07:04', 'Maricris Barcelon'),
-(18, 'Djanisse', 'dj123', 'Admin', '2024-11-24 09:21:02', 'Djanisse Villafor');
+(19, 'linuxadona', 'admin123', 'Admin', '2024-11-25 11:34:12', 'Linux Adona'),
+(20, 'Jaydee', 'jaydee123', 'Customer', '2024-11-25 11:41:19', 'John Dave Briones'),
+(21, 'axlehernando', 'axle123', 'Customer', '2024-11-25 12:26:34', 'Axle Hernando');
 
 --
 -- Indexes for dumped tables
@@ -207,8 +195,7 @@ ALTER TABLE `orders`
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
-  ADD PRIMARY KEY (`ProductID`),
-  ADD KEY `SupplierID` (`UserID`);
+  ADD PRIMARY KEY (`ProductID`);
 
 --
 -- Indexes for table `users`
@@ -224,13 +211,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cardpayment`
 --
 ALTER TABLE `cardpayment`
-  MODIFY `CardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `CardID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `cashpayment`
 --
 ALTER TABLE `cashpayment`
-  MODIFY `CashID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `CashID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `orders`
@@ -242,13 +229,13 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Constraints for dumped tables
@@ -272,12 +259,6 @@ ALTER TABLE `cashpayment`
 ALTER TABLE `orders`
   ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`),
   ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`ProductID`) REFERENCES `products` (`ProductID`);
-
---
--- Constraints for table `products`
---
-ALTER TABLE `products`
-  ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
