@@ -1,6 +1,7 @@
 package UI.Admin;
 
 import Databases.DBConnection;
+import Objects.UserSession;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -9,6 +10,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.NumberFormat;
+import java.util.Locale;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
@@ -203,30 +206,87 @@ public class Add_Products extends javax.swing.JFrame {
         if (isValid) {
             try (Connection con = DBConnection.Connect()) {
                 String query = "INSERT INTO products (Name, Description, Price, Stocks, Category, SupplierName) VALUES (?, ?, ?, ?, ?, ?)";
+                
+                String supplier = txtSupplier.getText();
+                String product = txtName.getText();
+                String desc = txtDesc.getText();
+                double price = Double.parseDouble(txtPrice.getText());
+                int stocks = Integer.parseInt(txtStocks.getText());
+                String category = txtCat.getText();
+                
                 try (PreparedStatement ps = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                    ps.setString(1, txtName.getText());
-                    ps.setString(2, txtDesc.getText());
-                    ps.setDouble(3, Double.parseDouble(txtPrice.getText()));
-                    ps.setInt(4, Integer.parseInt(txtStocks.getText()));
-                    ps.setString(5, txtCat.getText());
-                    ps.setString(6, txtSupplier.getText());
+                    ps.setString(1, product);
+                    ps.setString(2, desc);
+                    ps.setDouble(3, price);
+                    ps.setInt(4, stocks);
+                    ps.setString(5, category);
+                    ps.setString(6, supplier);
+                    
+                    NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
+                    String formattedPrice = formatter.format(Double.parseDouble(txtPrice.getText()));
+                    
+                    String message = "Supplier Name: " + supplier + "\n"
+                            + "Product Name: " + product + "\n"
+                            + "Description: " + desc + "\n"
+                            + "Price: " + formattedPrice + "\n"
+                            + "Stocks: " + stocks + "\n"
+                            + "Category: " + category + "\n"
+                            + "Do you want to proceed?";
+                    int confirm = JOptionPane.showConfirmDialog(this, message,
+                            "Confirm Update", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
+                    
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        int rowsAffected = ps.executeUpdate();
+                        
+                        String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+                                + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+                                + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
+                        try (PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
+                            String userID = UserSession.getCurrentUserID();
+                            String queryUser = "SELECT * FROM users WHERE UserID = ?";
+                            try (PreparedStatement psUser = con.prepareStatement(queryUser)) {
+                                psUser.setString(1, userID);
+                                ResultSet rs = psUser.executeQuery();
+                                if (rs.next()) {
+                                    String fullName = rs.getString("FullName");
+                                    String role = rs.getString("Role");
 
-                    int rowsAffected = ps.executeUpdate();
-                    if (rowsAffected > 0) {
-                        try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                            if (generatedKeys.next()) {
-                                int productId = generatedKeys.getInt(1);
-                                String productIDString = String.valueOf(productId);
-                                saveFileToProjectFolder(selectedFile, productIDString);
-                                JOptionPane.showMessageDialog(this, "Product added successfully!");
-                                adminDashboard.refreshProducts();
-                                this.dispose();
-                            } else {
-                                JOptionPane.showMessageDialog(this, "Failed to retrieve product ID.");
+                                    psLogs.setString(1, userID);
+                                    psLogs.setString(2, fullName);
+                                    psLogs.setString(3, role);
+                                    psLogs.setString(4, "Add Product");
+                                    psLogs.setString(5, fullName + " Added a new Product:\n\n" 
+                                            + "Supplier Name: " + supplier + "\n"
+                                            + "Product: " + product + "\n"
+                                            + "Desciption: " + desc + "\n"
+                                            + "Price: " + formattedPrice + "\n"
+                                            + "Stocks: " + stocks + "\n"
+                                            + "Category: " + category);
+                                    psLogs.executeUpdate();
+                                }
                             }
                         }
+                        
+                        if (rowsAffected > 0) {
+                            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                                if (generatedKeys.next()) {
+                                    int productId = generatedKeys.getInt(1);
+                                    String productIDString = String.valueOf(productId);
+                                    saveFileToProjectFolder(selectedFile, productIDString);
+                                    JOptionPane.showMessageDialog(this, "Product added successfully!");
+                                    adminDashboard.refreshProducts();
+                                    this.dispose();
+                                } else {
+                                    JOptionPane.showMessageDialog(this, "Failed to retrieve product ID.");
+                                }
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(this, "No rows affected. Insert failed.");
+                        }
                     } else {
-                        JOptionPane.showMessageDialog(this, "No rows affected. Insert failed.");
+                        JOptionPane.showMessageDialog(this, "Adding product canceled.",
+                                "Cancellation", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
             } catch (SQLException e) {

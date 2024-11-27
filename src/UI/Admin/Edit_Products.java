@@ -1,6 +1,7 @@
 package UI.Admin;
 
 import Databases.DBConnection;
+import Objects.UserSession;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -241,24 +242,32 @@ public class Edit_Products extends javax.swing.JFrame {
         if (isValid) {
             try (Connection con = DBConnection.Connect()) {
                 String query = "UPDATE products SET Name = ?, Description = ?, Price = ?, Stocks = ?, Category = ?, SupplierName = ? WHERE ProductID = ?";
+                
+                String supplier = txtSupplier.getText();
+                String product = txtName.getText();
+                String desc = txtDesc.getText();
+                double price = Double.parseDouble(txtPrice.getText());
+                int stocks = Integer.parseInt(txtStocks.getText());
+                String category = txtCategory.getText();
+                
                 try (PreparedStatement ps = con.prepareStatement(query)) {
-                    ps.setString(1, txtName.getText());
-                    ps.setString(2, txtDesc.getText());
-                    ps.setDouble(3, Double.parseDouble(txtPrice.getText()));
-                    ps.setInt(4, Integer.parseInt(txtStocks.getText()));
-                    ps.setString(5, txtCategory.getText());
-                    ps.setString(6, txtSupplier.getText());
+                    ps.setString(1, product);
+                    ps.setString(2, desc);
+                    ps.setDouble(3, price);
+                    ps.setInt(4, stocks);
+                    ps.setString(5, category);
+                    ps.setString(6, supplier);
                     ps.setString(7, selectedID);
 
                     NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
                     String formattedPrice = formatter.format(Double.parseDouble(txtPrice.getText()));
 
-                    String message = "Supplier Name: " + txtSupplier.getText() + "\n"
-                            + "Product Name: " + txtName.getText() + "\n"
-                            + "Description: " + txtDesc.getText() + "\n"
+                    String message = "Supplier Name: " + supplier + "\n"
+                            + "Product Name: " + product + "\n"
+                            + "Description: " + desc + "\n"
                             + "Price: " + formattedPrice + "\n"
-                            + "Stocks: " + txtStocks.getText() + "\n"
-                            + "Category: " + txtCategory.getText() + "\n"
+                            + "Stocks: " + stocks + "\n"
+                            + "Category: " + category + "\n"
                             + "Do you want to proceed?";
                     int confirm = JOptionPane.showConfirmDialog(this, message,
                             "Confirm Update", JOptionPane.YES_NO_OPTION,
@@ -266,6 +275,36 @@ public class Edit_Products extends javax.swing.JFrame {
 
                     if (confirm == JOptionPane.YES_OPTION) {
                         int rowsAffected = ps.executeUpdate();
+                        
+                        String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+                                + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+                                + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
+                        try (PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
+                            String userID = UserSession.getCurrentUserID();
+                            String queryUser = "SELECT * FROM users WHERE UserID = ?";
+                            try (PreparedStatement psUser = con.prepareStatement(queryUser)) {
+                                psUser.setString(1, userID);
+                                ResultSet rs = psUser.executeQuery();
+                                if (rs.next()) {
+                                    String fullName = rs.getString("FullName");
+                                    String role = rs.getString("Role");
+
+                                    psLogs.setString(1, userID);
+                                    psLogs.setString(2, fullName);
+                                    psLogs.setString(3, role);
+                                    psLogs.setString(4, "Edit Product");
+                                    psLogs.setString(5, fullName + " Edited a Product:\n\n"
+                                            + "Supplier Name: " + supplier + "\n"
+                                            + "Product: " + product + "\n"
+                                            + "Desciption: " + desc + "\n"
+                                            + "Price: " + formattedPrice + "\n"
+                                            + "Stocks: " + stocks + "\n"
+                                            + "Category: " + category);
+                                    psLogs.executeUpdate();
+                                }
+                            }
+                        }
+                        
                         if (rowsAffected > 0) {
                             JOptionPane.showMessageDialog(this, "Product updated successfully!");
                             adminDashboard.refreshProducts();

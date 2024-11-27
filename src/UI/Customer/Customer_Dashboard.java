@@ -2,12 +2,14 @@ package UI.Customer;
 
 import Databases.DBConnection;
 import UI.Login_Form;
+import Objects.UserSession;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -240,6 +242,10 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
                     + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?, ?, ?)";
             String updateStockQuery = "UPDATE products SET Stocks = Stocks - ? WHERE ProductID = ?";
+            String query = "SELECT * FROM users WHERE UserID = ?";
+            String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+                    + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+                    + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
             
             for (int i = 0; i < cartTableModel.getRowCount(); i++) {
                 String ID = cartTableModel.getValueAt(i, 0).toString();
@@ -255,7 +261,23 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "The product '" + productName + "' does not have enough stock.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-
+                
+                try (PreparedStatement ps = con.prepareStatement(query); PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
+                    ps.setString(1, userID);
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()) {
+                        String fullName = rs.getString("FullName");
+                        String role = rs.getString("Role");
+                        
+                        psLogs.setString(1, userID);
+                        psLogs.setString(2, fullName);
+                        psLogs.setString(3, role);
+                        psLogs.setString(4, "Ordered");
+                        psLogs.setString(5, fullName + " has Ordered " + quantity + " " + productName + " from our store.");
+                        psLogs.executeUpdate();
+                    }
+                }
+                
                 try (PreparedStatement psOrder = con.prepareStatement(insertOrderQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     psOrder.setString(1, userID);
                     psOrder.setString(2, ID);
@@ -347,7 +369,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "Name", "Qty", "Price"
+                "PID", "Name", "Qty", "Price"
             }
         ) {
             Class[] types = new Class [] {
@@ -409,7 +431,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                 {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Name", "Price", "Seller", "Category"
+                "PID", "Name", "Price", "Seller", "Category"
             }
         ));
         Table_Products.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -836,7 +858,6 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     JOptionPane.QUESTION_MESSAGE);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                
                 insertOrderIntoDatabase(loggedInUserID, modeOfPayment);
                 insertCashIntoDatabase(loggedInUserID, String.valueOf(calculateTotal()));
             }
@@ -844,9 +865,37 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCheckOutActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        Login_Form login = Login_Form.getInstance();
-        login.setVisible(true);
-        this.dispose();
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to Log Out?", "Log Out", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            String query = "SELECT * FROM users WHERE UserID = ?";
+            String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+                    + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+                    + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
+            String userID = UserSession.getCurrentUserID();
+            try (Connection con = DBConnection.Connect(); PreparedStatement ps = con.prepareStatement(query); PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
+                ps.setString(1, userID);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    String fullName = rs.getString("FullName");
+                    String role = rs.getString("Role");
+
+                    psLogs.setString(1, userID);
+                    psLogs.setString(2, fullName);
+                    psLogs.setString(3, role);
+                    psLogs.setString(4, "Logged Out");
+                    psLogs.setString(5, fullName + " has Logged Out.");
+                    psLogs.executeUpdate();
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage(), "Login Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
+            Login_Form login = Login_Form.getInstance();
+            login.setVisible(true);
+            this.dispose();
+        }
     }//GEN-LAST:event_btnBackActionPerformed
  
     private void btnAddToCartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddToCartActionPerformed

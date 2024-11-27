@@ -223,22 +223,40 @@ public class Login_Form extends javax.swing.JFrame {
         }
 
         String query = "SELECT * FROM users WHERE Username = ?";
+        String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+        + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+        + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
         try(Connection con = DBConnection.Connect();
-            PreparedStatement ps = con.prepareStatement(query)) {
+            PreparedStatement ps = con.prepareStatement(query);
+            PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
+            
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
+            
             if (rs.next()) {
                 String storedPassword = rs.getString("Password");
+                String role = rs.getString("Role");
+                loggedInUserID = rs.getString("UserID");
+                String fullName = rs.getString("FullName");
+                
+                User loggedInUser = new User(loggedInUserID, username, storedPassword);
+                UserSession.setCurrentUser(loggedInUser);
+                String userID = UserSession.getCurrentUserID();
+                
                 if (storedPassword.equals(password)) {
-                    loggedInUserID = rs.getString("UserID");
-                    JOptionPane.showMessageDialog(this, "Welcome, " + rs.getString("FullName") + "!", "Login Successful", JOptionPane.INFORMATION_MESSAGE);
-                    String role = rs.getString("Role");
+                    JOptionPane.showMessageDialog(this, "Welcome, " + fullName + "!", "Login Successful", JOptionPane.INFORMATION_MESSAGE);
+                    
+                    psLogs.setString(1, userID);
+                    psLogs.setString(2, fullName);
+                    psLogs.setString(3, role);
+                    psLogs.setString(4, "Logged In");
+                    psLogs.setString(5, fullName + " Logged In as " + role + ".");
+                    psLogs.executeUpdate();
+                    
                     switch (role) {
                         case "Customer":
                             Customer_Dashboard customerDashboard = new Customer_Dashboard();
                             customerDashboard.setVisible(true);
-                            User loggedInUser  = new User(loggedInUserID, username, storedPassword);
-                            UserSession.setCurrentUser(loggedInUser);
                             resetFields();
                             this.dispose();
                             break;

@@ -1,6 +1,7 @@
 package UI.Admin;
 
 import Databases.DBConnection;
+import Objects.UserSession;
 import UI.Login_Form;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -8,6 +9,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.Locale;
 import javax.imageio.ImageIO;
@@ -221,6 +223,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         List_Category = new javax.swing.JList<>();
         jLabel2 = new javax.swing.JLabel();
+        btnUserLogs = new javax.swing.JButton();
 
         lblWelcome.setFont(new java.awt.Font("Helvetica", 1, 26)); // NOI18N
         lblWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -239,7 +242,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                 {null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Name", "Price", "Stock", "Category", "Supplier"
+                "PID", "Name", "Price", "Stock", "Category", "Supplier"
             }
         ));
         Table_Products.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -257,9 +260,11 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         lblProductName.setText("...");
 
         lblProductDesc.setColumns(20);
+        lblProductDesc.setLineWrap(true);
         lblProductDesc.setRows(5);
         lblProductDesc.setToolTipText("");
         lblProductDesc.setWrapStyleWord(true);
+        lblProductDesc.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jScrollPane2.setViewportView(lblProductDesc);
 
         lblStocks.setFont(new java.awt.Font("Helvetica", 1, 14)); // NOI18N
@@ -450,6 +455,17 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        btnUserLogs.setBackground(new java.awt.Color(153, 153, 255));
+        btnUserLogs.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
+        btnUserLogs.setText("User Logs");
+        btnUserLogs.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnUserLogs.setMargin(new java.awt.Insets(2, 0, 3, 0));
+        btnUserLogs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUserLogsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(MainPanel);
         MainPanel.setLayout(MainPanelLayout);
         MainPanelLayout.setHorizontalGroup(
@@ -475,6 +491,8 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(btnRemoveProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnUserLogs, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
                         .addComponent(btnViewSales, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MainPanelLayout.createSequentialGroup()
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -507,7 +525,8 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                     .addComponent(btnAddProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnEditProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRemoveProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnViewSales, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnViewSales, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnUserLogs, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -535,9 +554,37 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        Login_Form login = Login_Form.getInstance();
-        login.setVisible(true);
-        this.dispose();
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to Log Out?", "Log Out", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            String query = "SELECT * FROM users WHERE UserID = ?";
+            String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+                    + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+                    + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
+            String userID = UserSession.getCurrentUserID();
+            try (Connection con = DBConnection.Connect(); PreparedStatement ps = con.prepareStatement(query); PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
+                ps.setString(1, userID);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    String fullName = rs.getString("FullName");
+                    String role = rs.getString("Role");
+
+                    psLogs.setString(1, userID);
+                    psLogs.setString(2, fullName);
+                    psLogs.setString(3, role);
+                    psLogs.setString(4, "Logged Out");
+                    psLogs.setString(5, fullName + " has Logged Out.");
+                    psLogs.executeUpdate();
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage(), "Login Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            Login_Form login = Login_Form.getInstance();
+            login.setVisible(true);
+            this.dispose();
+        }
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnEditProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditProductActionPerformed
@@ -566,12 +613,19 @@ public class Admin_Dashboard extends javax.swing.JFrame {
 
         productTableModel = (DefaultTableModel) Table_Products.getModel();
         String productId = Table_Products.getValueAt(selectedRow, 0).toString();
-
-        String message = "Name: " + lblProductName.getText() + "\n"
-                + "Description: " + lblProductDesc.getText() + "\n"
-                + "Price: " + Table_Products.getValueAt(selectedRow, 2).toString() + "\n"
-                + "Stocks: " + Table_Products.getValueAt(selectedRow, 3).toString() + "\n"
-                + "Category: " + Table_Products.getValueAt(selectedRow, 4).toString() + "\n"
+        String supplier = Table_Products.getValueAt(selectedRow, 5).toString();
+        String product = lblProductName.getText();
+        String desc = lblProductDesc.getText();
+        String price = Table_Products.getValueAt(selectedRow, 2).toString();
+        String stocks = Table_Products.getValueAt(selectedRow, 3).toString();
+        String category = Table_Products.getValueAt(selectedRow, 4).toString();
+                
+        String message = "Supplier: " + supplier 
+                + "Product: " + product + "\n"
+                + "Description: " + desc + "\n"
+                + "Price: " + price + "\n"
+                + "Stocks: " + stocks + "\n"
+                + "Category: " + category + "\n"
                 + "Do you want to proceed?";
 
         int confirm = JOptionPane.showConfirmDialog(this, message,
@@ -583,8 +637,36 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                 String removeQuery = "DELETE FROM products WHERE ProductID = ?";
                 try (PreparedStatement ps = con.prepareStatement(removeQuery)) {
                     ps.setString(1, productId);
-
                     int rowsAffected = ps.executeUpdate();
+                    
+                    String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+                            + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+                            + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
+                    try (PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
+                        String userID = UserSession.getCurrentUserID();
+                        String queryUser = "SELECT * FROM users WHERE UserID = ?";
+                        try (PreparedStatement psUser = con.prepareStatement(queryUser)) {
+                            psUser.setString(1, userID);
+                            ResultSet rs = psUser.executeQuery();
+                            if (rs.next()) {
+                                String fullName = rs.getString("FullName");
+                                String role = rs.getString("Role");
+
+                                psLogs.setString(1, userID);
+                                psLogs.setString(2, fullName);
+                                psLogs.setString(3, role);
+                                psLogs.setString(4, "Remove Product");
+                                psLogs.setString(5, fullName + " Removed a Product:\n\n"
+                                        + "Supplier Name: " + supplier + "\n"
+                                        + "Product: " + product + "\n"
+                                        + "Desciption: " + desc + "\n"
+                                        + "Price: " + price + "\n"
+                                        + "Stocks: " + stocks + "\n"
+                                        + "Category: " + category);
+                                psLogs.executeUpdate();
+                            }
+                        }
+                    }
 
                     if (rowsAffected > 0) {
                         String imagePath = getProductImage(productId);
@@ -662,6 +744,11 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_List_CategoryMouseClicked
 
+    private void btnUserLogsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUserLogsActionPerformed
+        User_Logs userLogs = new User_Logs();
+        userLogs.setVisible(true);
+    }//GEN-LAST:event_btnUserLogsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JList<String> List_Category;
     private javax.swing.JPanel MainPanel;
@@ -671,6 +758,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
     private javax.swing.JButton btnEditProduct;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnRemoveProduct;
+    private javax.swing.JButton btnUserLogs;
     private javax.swing.JButton btnViewSales;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel2;

@@ -215,7 +215,7 @@ public class Sales_Table extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Product Name", "Qty", "Price", "Date", "Time", "Customer", "Category", "Payment"
+                "PID", "Product Name", "Qty", "Price", "Date", "Time", "Customer", "Category", "Payment"
             }
         ));
         jScrollPane2.setViewportView(Sales_Table);
@@ -441,12 +441,8 @@ public class Sales_Table extends javax.swing.JFrame {
         loadSalesData(null, sortBy);
     }//GEN-LAST:event_comboSortActionPerformed
 
-    private void refreshSales() {
-        loadSalesData(null, null);
-    }
-    
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-        refreshSales();
+        loadSalesData(null, null);
     }//GEN-LAST:event_btnRefreshActionPerformed
 
 

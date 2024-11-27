@@ -227,9 +227,13 @@ public class SignUp_Form extends javax.swing.JFrame {
         }
 
         String insertUserQuery = "INSERT INTO users (Username, Password, Role, FullName) VALUES (?, ?, ?, ?)";
+        String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+                + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+                + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
 
         try (Connection con = DBConnection.Connect();
-            PreparedStatement ps = con.prepareStatement(insertUserQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement ps = con.prepareStatement(insertUserQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
             ps.setString(1, username);
             ps.setString(2, password);
             ps.setString(3, "Customer");
@@ -238,6 +242,15 @@ public class SignUp_Form extends javax.swing.JFrame {
 
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
+                String userID = generatedKeys.getString(1);
+                
+                psLogs.setString(1, userID);
+                psLogs.setString(2, fullName);
+                psLogs.setString(3, "Customer");
+                psLogs.setString(4, "Signed Up");
+                psLogs.setString(5, fullName + " has Signed Up to our store!");
+                psLogs.executeUpdate();
+
                 JOptionPane.showMessageDialog(this, "User  registered successfully!");
                 this.dispose();
                 Login_Form login = Login_Form.getInstance();
