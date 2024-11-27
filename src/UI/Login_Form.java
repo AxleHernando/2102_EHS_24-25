@@ -1,5 +1,7 @@
 package UI;
 
+import UI.Admin.Admin_Dashboard;
+import UI.Customer.Customer_Dashboard;
 import Databases.DBConnection;
 import Objects.User;
 import Objects.UserSession;
@@ -55,11 +57,13 @@ public class Login_Form extends javax.swing.JFrame {
         btnSignUp = new javax.swing.JButton();
         txtUsername = new javax.swing.JTextField();
         tbShowPass = new javax.swing.JToggleButton();
+        jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Log in");
         setBackground(new java.awt.Color(255, 255, 255));
         setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(211, 211, 211));
         jPanel1.setPreferredSize(new java.awt.Dimension(275, 550));
@@ -116,6 +120,11 @@ public class Login_Form extends javax.swing.JFrame {
         });
 
         txtUsername.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtUsername.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtUsernameKeyPressed(evt);
+            }
+        });
 
         tbShowPass.setFont(new java.awt.Font("Helvetica", 0, 12)); // NOI18N
         tbShowPass.setText("Show");
@@ -168,27 +177,31 @@ public class Login_Form extends javax.swing.JFrame {
                 .addComponent(lblPassword)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tbShowPass, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(23, 23, 23))
         );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 275, Short.MAX_VALUE))
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 320));
+
+        jPanel2.setBackground(new java.awt.Color(239, 239, 239));
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 280, Short.MAX_VALUE)
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 320, Short.MAX_VALUE)
         );
+
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 0, 280, -1));
 
         pack();
         setLocationRelativeTo(null);
@@ -224,7 +237,7 @@ public class Login_Form extends javax.swing.JFrame {
                         case "Customer":
                             Customer_Dashboard customerDashboard = new Customer_Dashboard();
                             customerDashboard.setVisible(true);
-                            User loggedInUser  = new User(rs.getString("UserID"), username, storedPassword);
+                            User loggedInUser  = new User(loggedInUserID, username, storedPassword);
                             UserSession.setCurrentUser(loggedInUser);
                             resetFields();
                             this.dispose();
@@ -271,6 +284,13 @@ public class Login_Form extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_tbShowPassActionPerformed
 
+    private void txtUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsernameKeyPressed
+        if (evt.getKeyChar() == ' ') {
+            evt.consume();
+            JOptionPane.showMessageDialog(Login_Form.this, "Spaces are not allowed in the username.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_txtUsernameKeyPressed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -312,6 +332,7 @@ public class Login_Form extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblPassword;
     private javax.swing.JLabel lblUsername1;
     private javax.swing.JLabel lblWelcome;

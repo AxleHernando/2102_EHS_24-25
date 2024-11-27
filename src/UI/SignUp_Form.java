@@ -21,6 +21,8 @@ public class SignUp_Form extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        btnBack = new javax.swing.JButton();
+        lblWelcome = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         lblUsername1 = new javax.swing.JLabel();
         lblPassword = new javax.swing.JLabel();
@@ -33,12 +35,25 @@ public class SignUp_Form extends javax.swing.JFrame {
         lblPassword2 = new javax.swing.JLabel();
         lblPassword3 = new javax.swing.JLabel();
         txtLastName = new javax.swing.JTextField();
-        btnBack = new javax.swing.JButton();
-        lblWelcome = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        btnBack1 = new javax.swing.JButton();
+        lblWelcome1 = new javax.swing.JLabel();
+
+        btnBack.setBackground(new java.awt.Color(153, 153, 255));
+        btnBack.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
+        btnBack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/back.png"))); // NOI18N
+        btnBack.setText("Go Back");
+        btnBack.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnBack.setMargin(new java.awt.Insets(2, 0, 3, 0));
+
+        lblWelcome.setFont(new java.awt.Font("Helvetica", 1, 26)); // NOI18N
+        lblWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblWelcome.setIcon(new javax.swing.ImageIcon("C:\\Users\\ADMIN\\Downloads\\SHOP-A-LOO (1) (2).png")); // NOI18N
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sign Up");
         setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(211, 211, 211));
         jPanel1.setPreferredSize(new java.awt.Dimension(275, 550));
@@ -108,9 +123,7 @@ public class SignUp_Form extends javax.swing.JFrame {
                                     .addComponent(txtFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(lblPassword3)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(lblPassword3)
                                     .addComponent(txtLastName)))
                             .addComponent(txtPassword1, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtPassword, javax.swing.GroupLayout.Alignment.LEADING)
@@ -147,50 +160,49 @@ public class SignUp_Form extends javax.swing.JFrame {
                 .addGap(25, 25, 25))
         );
 
-        btnBack.setBackground(new java.awt.Color(153, 153, 255));
-        btnBack.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
-        btnBack.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/back.png"))); // NOI18N
-        btnBack.setText("Go Back");
-        btnBack.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnBack.setMargin(new java.awt.Insets(2, 0, 3, 0));
-        btnBack.addActionListener(new java.awt.event.ActionListener() {
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(275, 0, -1, 370));
+
+        btnBack1.setBackground(new java.awt.Color(153, 153, 255));
+        btnBack1.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
+        btnBack1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/back.png"))); // NOI18N
+        btnBack1.setText("Go Back");
+        btnBack1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnBack1.setMargin(new java.awt.Insets(2, 0, 3, 0));
+        btnBack1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackActionPerformed(evt);
+                btnBack1ActionPerformed(evt);
             }
         });
 
-        lblWelcome.setFont(new java.awt.Font("Helvetica", 1, 26)); // NOI18N
-        lblWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblWelcome.setIcon(new javax.swing.ImageIcon("C:\\Users\\ADMIN\\Downloads\\SHOP-A-LOO (1) (2).png")); // NOI18N
+        lblWelcome1.setFont(new java.awt.Font("Helvetica", 1, 26)); // NOI18N
+        lblWelcome1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblWelcome1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Shopaloo-signup.png"))); // NOI18N
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(133, 133, 133))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addComponent(lblWelcome)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addComponent(btnBack1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(lblWelcome1)))
+                .addContainerGap(139, Short.MAX_VALUE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(lblWelcome)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE))
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblWelcome1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 180, Short.MAX_VALUE)
+                .addComponent(btnBack1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24))
         );
+
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 280, 370));
 
         pack();
         setLocationRelativeTo(null);
@@ -236,12 +248,6 @@ public class SignUp_Form extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnSignUpActionPerformed
 
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        Login_Form login = Login_Form.getInstance();
-        login.setVisible(true);
-        this.setVisible(false);
-    }//GEN-LAST:event_btnBackActionPerformed
-
     private void txtUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsernameKeyPressed
         if (evt.getKeyChar() == ' ') {
             evt.consume();
@@ -249,17 +255,26 @@ public class SignUp_Form extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtUsernameKeyPressed
 
+    private void btnBack1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBack1ActionPerformed
+        Login_Form login = Login_Form.getInstance();
+        login.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnBack1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnBack1;
     private javax.swing.JButton btnSignUp;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblPassword;
     private javax.swing.JLabel lblPassword1;
     private javax.swing.JLabel lblPassword2;
     private javax.swing.JLabel lblPassword3;
     private javax.swing.JLabel lblUsername1;
     private javax.swing.JLabel lblWelcome;
+    private javax.swing.JLabel lblWelcome1;
     private javax.swing.JTextField txtFirstName;
     private javax.swing.JTextField txtLastName;
     private javax.swing.JPasswordField txtPassword;
