@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 
 public class DBConnection {
     public static Connection Connect() {
-        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_24-25";
+        String dbUrl = "jdbc:mysql://localhost:3306/2102_ehs_2425";
         String dbUser  = "root";
         String dbPassword = "";
         

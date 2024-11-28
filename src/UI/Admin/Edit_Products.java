@@ -14,7 +14,8 @@ import javax.swing.JOptionPane;
 
 public class Edit_Products extends javax.swing.JFrame {
     private final Admin_Dashboard adminDashboard;
-    private String selectedProductID;
+    private final String selectedProductID;
+    private boolean productUpdated = false;
 
     public Edit_Products(Admin_Dashboard adminDashboard, String productID) {
         initComponents();
@@ -120,7 +121,7 @@ public class Edit_Products extends javax.swing.JFrame {
 
         btnSubmit.setBackground(new java.awt.Color(153, 153, 255));
         btnSubmit.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
-        btnSubmit.setText("Submit");
+        btnSubmit.setText("Save Changes");
         btnSubmit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSubmit.setMargin(new java.awt.Insets(2, 0, 3, 0));
         btnSubmit.addActionListener(new java.awt.event.ActionListener() {
@@ -275,6 +276,7 @@ public class Edit_Products extends javax.swing.JFrame {
 
                     if (confirm == JOptionPane.YES_OPTION) {
                         int rowsAffected = ps.executeUpdate();
+                        productUpdated = true;
                         
                         String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
                                 + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
@@ -323,6 +325,10 @@ public class Edit_Products extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnSubmitActionPerformed
 
+    public boolean isProductUpdated() {
+        return productUpdated;
+    }
+    
     private void saveFileToProjectFolder(java.io.File file, String productId) {
         try {
             java.io.File destFolder = new java.io.File("src/product_images");

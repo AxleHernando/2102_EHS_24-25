@@ -239,12 +239,14 @@ public class Customer_Dashboard extends javax.swing.JFrame {
     private void insertOrderIntoDatabase(String userID, String modeOfPayment) {
         try (Connection con = DBConnection.Connect()) {
             String insertOrderQuery = "INSERT INTO orders (UserID, ProductID, Quantity, Date, Time, Price, ModeOfPayment, Category) VALUES (?, ?, ?, "
-                    + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
-                    + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?, ?, ?)";
+                + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+                + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?, ?, ?)";
             String insertOrderHistoryQuery = "INSERT INTO orderhistory (OrderID, Name, products, Qty, Price, Payment, Date, Time) "
-                + "VALUES (?, ?, ?, ?, ?, ?, CURDATE(), CURTIME())";
-            String queryUser = "SELECT FullName FROM users WHERE UserID = ?";
-            
+                    + "VALUES (?, ?, ?, ?, ?, ?, CURDATE(), NOW())";
+            String queryUser = "SELECT * FROM users WHERE UserID = ?";
+            String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+                + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+                + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
             String updateStockQuery = "UPDATE products SET Stocks = Stocks - ? WHERE ProductID = ?";
             
             for (int i = 0; i < cartTableModel.getRowCount(); i++) {
@@ -270,7 +272,6 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     psOrder.setString(5, modeOfPayment);
                     psOrder.setString(6, category);
                     psOrder.executeUpdate();
-                    
                     try (ResultSet generatedKeys = psOrder.getGeneratedKeys()) {
                         if (generatedKeys.next()) {
                             OID = generatedKeys.getInt(1);
@@ -289,6 +290,9 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                     ResultSet rs = psUser.executeQuery();
                     if (rs.next()) {
                         String fullName = rs.getString("FullName");
+                        String role = rs.getString("Role");
+                        String action = "Ordered";
+                        String notes = fullName + " ordered " + quantity + " " + productName + " from our store!";
 
                         try (PreparedStatement psOrderHistory = con.prepareStatement(insertOrderHistoryQuery)) {
                             psOrderHistory.setInt(1, OID);
@@ -297,7 +301,16 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                             psOrderHistory.setInt(4, quantity);
                             psOrderHistory.setDouble(5, price);
                             psOrderHistory.setString(6, modeOfPayment);
-                            psOrderHistory.executeUpdate(); // Missing executeUpdate
+                            psOrderHistory.executeUpdate();
+                        }
+                        
+                        try (PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
+                            psLogs.setString(1, userID);
+                            psLogs.setString(2, fullName);
+                            psLogs.setString(3, role);
+                            psLogs.setString(4, action);
+                            psLogs.setString(5, notes);
+                            psLogs.executeUpdate();
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "User  not found.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -535,7 +548,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
+                .addComponent(jScrollPane4)
                 .addContainerGap())
         );
 
@@ -552,6 +565,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
             }
         });
 
+        HistoryBtn.setFont(new java.awt.Font("Helvetica", 1, 12)); // NOI18N
         HistoryBtn.setText("Order History");
         HistoryBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -930,10 +944,10 @@ public class Customer_Dashboard extends javax.swing.JFrame {
             String ID = Table_Products.getValueAt(row, 0).toString();
             String productName = Table_Products.getValueAt(row, 1).toString();
             String priceString = Table_Products.getValueAt(row, 2).toString();
-            int quantity = Integer.parseInt(txtQuantity.getText());
-            int stock = getCurrentStock(ID);
-            
+            int quantity;
+
             try {
+                quantity = Integer.parseInt(txtQuantity.getText());
                 if (quantity <= 0) {
                     throw new NumberFormatException("Quantity must be greater than zero.");
                 }
@@ -941,13 +955,10 @@ public class Customer_Dashboard extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Invalid quantity value! Please enter a positive integer.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
-            try {
-                if(quantity > stock) {
-                    throw new NumberFormatException("Quantity must be lower than " + stock + ".");
-                }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Quantity is larger than the stock available for the product.", "Error", JOptionPane.ERROR_MESSAGE);
+
+            int stock = getCurrentStock(ID);
+            if (quantity > stock) {
+                JOptionPane.showMessageDialog(null, "Quantity is larger than the stock available for the product. Available stock: " + stock + ".", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -966,6 +977,10 @@ public class Customer_Dashboard extends javax.swing.JFrame {
             for (int i = 0; i < cartTableModel.getRowCount(); i++) {
                 if (cartTableModel.getValueAt(i, 0).equals(ID)) {
                     int existingQuantity = (int) cartTableModel.getValueAt(i, 2);
+                    if (existingQuantity + quantity > stock) {
+                        JOptionPane.showMessageDialog(null, "Adding this quantity exceeds available stock. Available stock: " + stock + ".", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     cartTableModel.setValueAt(existingQuantity + quantity, i, 2);
                     productExists = true;
                     break;
@@ -1028,6 +1043,7 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         cartTableModel.removeRow(selectedRow);
 
         updateTotal();
+        txtQuantityCart.setText("1");
     }//GEN-LAST:event_btnRemoveProductActionPerformed
 
     private void Table_ProductsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Table_ProductsMouseClicked

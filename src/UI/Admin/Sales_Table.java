@@ -19,7 +19,7 @@ public class Sales_Table extends javax.swing.JFrame {
 
     public Sales_Table() {
         initComponents();
-        loadSalesData(null, null);
+        loadSalesData(null, null, null);
         setIcon();
     }
     
@@ -28,7 +28,7 @@ public class Sales_Table extends javax.swing.JFrame {
         setIconImage(icon.getImage());
     }
 
-    private void loadSalesData(String categoryFilter, String sortBy) {
+    private void loadSalesData(String categoryFilter, String sortBy, String sortOrder) {
         salesTableModel = (DefaultTableModel) Sales_Table.getModel();
         salesTableModel.setRowCount(0);
         double totalSales = 0.0;
@@ -65,14 +65,13 @@ public class Sales_Table extends javax.swing.JFrame {
                 if (hasWhereClause) {
                     query += " AND ";
                 } else {
-                    query += " WHERE ";
+                    query += " ORDER BY ";
                 }
-                query += getSortColumn(sortBy);
+                query += getSortColumn(sortBy) + " ";
+                query += sortOrder != null && (sortOrder.equals("Ascending") || sortOrder.equals("Lowest") || sortOrder.equals("Old")) ? "ASC" : "DESC";
             }
 
-            if (sortBy != null && !sortBy.isEmpty()) {
-                query += " ORDER BY " + getOrderClause(sortBy);
-            } else {
+            if (!hasWhereClause && (sortBy == null || sortBy.isEmpty())) {
                 query += " ORDER BY o.OrderID";
             }
             
@@ -113,23 +112,9 @@ public class Sales_Table extends javax.swing.JFrame {
     private String getSortColumn(String sortBy) {
         switch (sortBy) {
             case "Date":
-                return "o.Date";
+                return "o.Date, o.Time";
             case "Price":
                 return "o.Price";
-            case "ID":
-                return "o.OrderID";
-            default:
-                return "o.OrderID";
-        }
-    }
-    
-    private String getOrderClause(String sortBy) {
-        switch (sortBy) {
-            case "Date":
-                return "o.Date DESC, o.Time DESC";
-            case "Price":
-                return "o.Price DESC";
-            case "Customer":
             case "ID":
                 return "o.OrderID";
             default:
@@ -202,6 +187,7 @@ public class Sales_Table extends javax.swing.JFrame {
         comboSort = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
         btnRefresh = new javax.swing.JButton();
+        comboSortOrder = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Sales");
@@ -340,6 +326,12 @@ public class Sales_Table extends javax.swing.JFrame {
             }
         });
 
+        comboSortOrder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboSortOrderActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -350,7 +342,7 @@ public class Sales_Table extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 884, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -359,10 +351,12 @@ public class Sales_Table extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(comboSort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
+                                .addComponent(comboSortOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblSearch)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 142, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btnRefresh)
                                 .addGap(34, 34, 34)))
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -376,7 +370,7 @@ public class Sales_Table extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -386,15 +380,15 @@ public class Sales_Table extends javax.swing.JFrame {
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(comboSort, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(comboSortOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(comboSort)
                                     .addComponent(txtSearch)
-                                    .addComponent(lblSearch)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(1, 1, 1)
+                                    .addComponent(lblSearch))
                                 .addComponent(btnRefresh)))
                         .addGap(11, 11, 11))))
         );
@@ -432,25 +426,53 @@ public class Sales_Table extends javax.swing.JFrame {
     private void List_Category2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_List_Category2MouseClicked
         String selectedCategory = List_Category2.getSelectedValue();
         if (selectedCategory != null) {
-            loadSalesData(selectedCategory, null);
+            loadSalesData(selectedCategory, null, null);
         }
     }//GEN-LAST:event_List_Category2MouseClicked
 
     private void comboSortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboSortActionPerformed
         String sortBy = (String) comboSort.getSelectedItem();
-        loadSalesData(null, sortBy);
+        updateSortOrderOptions(sortBy);
+        loadSalesData(null, sortBy, (String) comboSortOrder.getSelectedItem());
     }//GEN-LAST:event_comboSortActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-        loadSalesData(null, null);
+        loadSalesData(null, null, null);
     }//GEN-LAST:event_btnRefreshActionPerformed
 
+    private void comboSortOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboSortOrderActionPerformed
+        String sortBy = (String) comboSort.getSelectedItem();
+        String sortOrder = (String) comboSortOrder.getSelectedItem();
+        loadSalesData(null, sortBy, sortOrder);
+    }//GEN-LAST:event_comboSortOrderActionPerformed
+
+    private void updateSortOrderOptions(String sortBy) {
+        comboSortOrder.removeAllItems();
+        switch (sortBy) {
+            case "ID":
+                comboSortOrder.addItem("Ascending");
+                comboSortOrder.addItem("Descending");
+                break;
+            case "Price":
+                comboSortOrder.addItem("Lowest");
+                comboSortOrder.addItem("Highest");
+                break;
+            case "Date":
+                comboSortOrder.addItem("Recent");
+                comboSortOrder.addItem("Old");
+                break;
+            default:
+                comboSortOrder.addItem("Ascending");
+                break;
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JList<String> List_Category2;
     private javax.swing.JTable Sales_Table;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JComboBox<String> comboSort;
+    private javax.swing.JComboBox<String> comboSortOrder;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;

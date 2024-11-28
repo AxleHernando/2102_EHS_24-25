@@ -595,8 +595,44 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         }
 
         String selectedProductID = Table_Products.getValueAt(selectedRow, 0).toString();
+
         Edit_Products editForm = new Edit_Products(this, selectedProductID);
         editForm.setVisible(true);
+
+        if (editForm.isProductUpdated()) {
+            String editNotes = JOptionPane.showInputDialog(this, "Please enter notes about what details you edited:");
+            if (editNotes == null || editNotes.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No notes provided. The edit action will not be logged.", "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try (Connection con = DBConnection.Connect()) {
+                String queryLogs = "INSERT INTO user_logs (User ID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+                        + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+                        + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
+                String userID = UserSession.getCurrentUserID();
+                String queryUser = "SELECT * FROM users WHERE UserID = ?";
+                try (PreparedStatement psUser = con.prepareStatement(queryUser)) {
+                    psUser.setString(1, userID);
+                    ResultSet rs = psUser.executeQuery();
+                    if (rs.next()) {
+                        String fullName = rs.getString("FullName");
+                        String role = rs.getString("Role");
+
+                        try (PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
+                            psLogs.setString(1, userID);
+                            psLogs.setString(2, fullName);
+                            psLogs.setString(3, role);
+                            psLogs.setString(4, "Edit Product");
+                            psLogs.setString(5, fullName + " edited a Product:\n\n" + editNotes);
+                            psLogs.executeUpdate();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Error logging edit action: " + e.getMessage());
+            }
+        }
     }//GEN-LAST:event_btnEditProductActionPerformed
 
     private void btnAddProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddProductActionPerformed
@@ -619,9 +655,9 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         String price = Table_Products.getValueAt(selectedRow, 2).toString();
         String stocks = Table_Products.getValueAt(selectedRow, 3).toString();
         String category = Table_Products.getValueAt(selectedRow, 4).toString();
-                
-        String message = "Supplier: " + supplier 
-                + "Product: " + product + "\n"
+
+        String message = "Supplier: " + supplier
+                + "\nProduct: " + product + "\n"
                 + "Description: " + desc + "\n"
                 + "Price: " + price + "\n"
                 + "Stocks: " + stocks + "\n"
@@ -633,15 +669,23 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                 JOptionPane.QUESTION_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
+            String removalNotes = JOptionPane.showInputDialog(this, "Please enter notes about the removal:");
+            if (removalNotes == null || removalNotes.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No notes provided. The removal action will not be logged.", "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             try (Connection con = DBConnection.Connect()) {
                 String removeQuery = "DELETE FROM products WHERE ProductID = ?";
                 try (PreparedStatement ps = con.prepareStatement(removeQuery)) {
                     ps.setString(1, productId);
                     int rowsAffected = ps.executeUpdate();
-                    
-                    String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+
+                    String queryLogs = "INSERT INTO user_logs (User ID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
                             + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
                             + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
+                    String deletedLogs = "INSERT INTO deleted_products (ProductID, Category, Name, Description, Price, Stocks, SupplierName) VALUES ("
+                            + "?, ?, ?, ?, ?, ?, ?)";
                     try (PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
                         String userID = UserSession.getCurrentUserID();
                         String queryUser = "SELECT * FROM users WHERE UserID = ?";
@@ -656,35 +700,46 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                                 psLogs.setString(2, fullName);
                                 psLogs.setString(3, role);
                                 psLogs.setString(4, "Remove Product");
-                                psLogs.setString(5, fullName + " Removed a Product:\n\n"
+                                psLogs.setString(5, fullName + " removed a Product:\n\n"
                                         + "Supplier Name: " + supplier + "\n"
                                         + "Product: " + product + "\n"
-                                        + "Desciption: " + desc + "\n"
+                                        + "Description: " + desc + "\n"
                                         + "Price: " + price + "\n"
                                         + "Stocks: " + stocks + "\n"
-                                        + "Category: " + category);
+                                        + "Category: " + category + "\n"
+                                        + "Notes: " + removalNotes); // Include removal notes
                                 psLogs.executeUpdate();
+
+                                try (PreparedStatement psDel = con.prepareStatement(deletedLogs)) {
+                                    psDel.setString(1, productId);
+                                    psDel.setString(2, category);
+                                    psDel.setString(3, product);
+                                    psDel.setString(4, desc);
+                                    psDel.setDouble(5, Double.parseDouble(price));
+                                    psDel.setInt(6, Integer.parseInt(stocks));
+                                    psDel.setString(7, supplier);
+                                    psDel.executeUpdate();
+                                }
                             }
                         }
-                    }
-
-                    if (rowsAffected > 0) {
-                        String imagePath = getProductImage(productId);
-                        java.io.File imageFile = new java.io.File(imagePath);
-                        if (imageFile.exists() && imageFile.isFile()) {
-                            if (imageFile.delete()) {
-                                System.out.println("Image file deleted: " + imagePath);
+                        if (rowsAffected > 0) {
+                            String imagePath = getProductImage(productId);
+                            java.io.File imageFile = new java.io.File(imagePath);
+                            if (imageFile.exists() && imageFile.isFile()) {
+                                if (imageFile.delete()) {
+                                    System.out.println("Image file deleted: " + imagePath);
+                                } else {
+                                    System.out.println("Failed to delete image file: " + imagePath);
+                                }
                             } else {
-                                System.out.println("Failed to delete image file: " + imagePath);
+                                System.out.println("Image file not found: " + imagePath);
                             }
-                        } else {
-                            System.out.println("Image file not found: " + imagePath);
-                        }
 
-                        JOptionPane.showMessageDialog(null, "Product removed successfully!", "Removed", JOptionPane.INFORMATION_MESSAGE);
-                        productTableModel.removeRow(selectedRow);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Product not found in the database.", "Error", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Product removed successfully!", "Removed", JOptionPane.INFORMATION_MESSAGE);
+                            productTableModel.removeRow(selectedRow);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Product not found in the database.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
             } catch (Exception e) {
