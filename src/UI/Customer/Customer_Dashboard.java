@@ -328,18 +328,29 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         }
     }
     
-    private void insertCashIntoDatabase(String userID, String cashTendered) {
+    private void insertCashIntoDatabase(String userID, double cashTendered, double change) {
+        if (userID == null || userID.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "User ID cannot be empty.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (cashTendered <= 0) {
+            JOptionPane.showMessageDialog(null, "Invalid cash tendered amount.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         try (Connection con = DBConnection.Connect()) {
-            String insertCashQuery = "INSERT INTO cashPayment (UserID, CashTendered) VALUES (?, ?)";
-            
+            String insertCashQuery = "INSERT INTO cashPayment (UserID, CashTendered, AmountChange) VALUES (?, ?, ?)";
             try (PreparedStatement ps = con.prepareStatement(insertCashQuery)) {
                 ps.setString(1, userID);
-                ps.setString(2, cashTendered);
+                ps.setDouble(2, cashTendered);
+                ps.setDouble(3, change);
                 ps.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Cash payment recorded successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
             }
         } catch (Exception e) {
-            System.out.println("Error during checkout: " + e.getMessage());
-            JOptionPane.showMessageDialog(null, "An error occurred while placing the order. Please try again.", "Error", JOptionPane.ERROR_MESSAGE); 
+            System.out.println("Error during cash payment insert: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "An error occurred while recording the payment. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -862,45 +873,89 @@ public class Customer_Dashboard extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void clearCart() {
+        cartTableModel.setRowCount(0);
+        updateTotal();
+        JOptionPane.showMessageDialog(this, "Your cart has been cleared. Thank you for shopping!", "Checkout Complete", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
     private void btnCheckOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCheckOutActionPerformed
         String loggedInUserID = getLoggedInUserID();
         String modeOfPayment = (String) comboModeOfPayment.getSelectedItem();
 
         if (loggedInUserID == null || loggedInUserID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "User  not logged in.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "User not logged in.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (modeOfPayment == null || modeOfPayment.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please select a valid mode of payment.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         cartTableModel = (DefaultTableModel) Table_ShoppingCart.getModel();
 
         if (cartTableModel.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(null, "Your shopping cart is empty. Please add products before checking out.", "Warning", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Your shopping cart is empty. Please add products before checking out.", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
+
+        double totalAmount = calculateTotal();
         updateTotal();
-        
+
         if ("Card Payment".equals(modeOfPayment)) {
-            CardPayment cardPayment = new CardPayment(calculateTotal());
+            CardPayment cardPayment = new CardPayment(totalAmount);
             cardPayment.setVisible(true);
 
             cardPayment.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosed(java.awt.event.WindowEvent windowEvent) {
                     insertOrderIntoDatabase(loggedInUserID, modeOfPayment);
+                    clearCart();
                 }
             });
-        } else {
-            String message = "Do you want to proceed with checkout?";
+        } else if ("Cash".equals(modeOfPayment)) {
+            double cashTendered = 0;
+            boolean validInput = false;
 
-            int confirm = JOptionPane.showConfirmDialog(this, message,
-                    "Confirm Checkout", JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
+            while (!validInput) {
+                String input = JOptionPane.showInputDialog(this,
+                        "Total Amount: PHP " + totalAmount + "\nEnter cash tendered:",
+                        "Cash Payment",
+                        JOptionPane.QUESTION_MESSAGE);
 
-            if (confirm == JOptionPane.YES_OPTION) {
-                insertOrderIntoDatabase(loggedInUserID, modeOfPayment);
-                insertCashIntoDatabase(loggedInUserID, String.valueOf(calculateTotal()));
+                if (input == null) {
+                    JOptionPane.showMessageDialog(this, "Payment cancelled.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+
+                try {
+                    cashTendered = Double.parseDouble(input);
+                    if (cashTendered < totalAmount) {
+                        JOptionPane.showMessageDialog(this,
+                                "Insufficient cash! Please enter an amount greater than or equal to PHP " + totalAmount,
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        validInput = true;
+                    }
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Invalid input! Please enter a valid numeric value.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
+
+            double change = cashTendered - totalAmount;
+            JOptionPane.showMessageDialog(this,
+                    "Payment Successful!\nChange: PHP " + String.format("%.2f", change),
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            insertOrderIntoDatabase(loggedInUserID, modeOfPayment);
+            insertCashIntoDatabase(loggedInUserID, cashTendered, change);
+
+            clearCart();
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid payment mode selected.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnCheckOutActionPerformed
 

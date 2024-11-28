@@ -587,6 +587,36 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnBackActionPerformed
 
+    private void logEditAction(String productID, String editNotes, Edit_Products editForm) {
+        try (Connection con = DBConnection.Connect()) {
+            String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+                    + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
+                    + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
+            String userID = UserSession.getCurrentUserID();
+            String queryUser = "SELECT * FROM users WHERE UserID = ?";
+
+            try (PreparedStatement psUser = con.prepareStatement(queryUser)) {
+                psUser.setString(1, userID);
+                ResultSet rs = psUser.executeQuery();
+                if (rs.next()) {
+                    String fullName = rs.getString("FullName");
+                    String role = rs.getString("Role");
+
+                    try (PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
+                        psLogs.setString(1, userID);
+                        psLogs.setString(2, fullName);
+                        psLogs.setString(3, role);
+                        psLogs.setString(4, "Edit Product");
+                        psLogs.setString(5, fullName + " edited a Product (ID: " + productID + "):\n\n" + editNotes + "\n\n" + editForm.getStockNotes());
+                        psLogs.executeUpdate();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error logging edit action: " + e.getMessage());
+        }
+    }
+    
     private void btnEditProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditProductActionPerformed
         int selectedRow = Table_Products.getSelectedRow();
         if (selectedRow == -1) {
@@ -597,42 +627,21 @@ public class Admin_Dashboard extends javax.swing.JFrame {
         String selectedProductID = Table_Products.getValueAt(selectedRow, 0).toString();
 
         Edit_Products editForm = new Edit_Products(this, selectedProductID);
-        editForm.setVisible(true);
-
-        if (editForm.isProductUpdated()) {
-            String editNotes = JOptionPane.showInputDialog(this, "Please enter notes about what details you edited:");
-            if (editNotes == null || editNotes.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No notes provided. The edit action will not be logged.", "Warning", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            try (Connection con = DBConnection.Connect()) {
-                String queryLogs = "INSERT INTO user_logs (User ID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
-                        + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
-                        + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
-                String userID = UserSession.getCurrentUserID();
-                String queryUser = "SELECT * FROM users WHERE UserID = ?";
-                try (PreparedStatement psUser = con.prepareStatement(queryUser)) {
-                    psUser.setString(1, userID);
-                    ResultSet rs = psUser.executeQuery();
-                    if (rs.next()) {
-                        String fullName = rs.getString("FullName");
-                        String role = rs.getString("Role");
-
-                        try (PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
-                            psLogs.setString(1, userID);
-                            psLogs.setString(2, fullName);
-                            psLogs.setString(3, role);
-                            psLogs.setString(4, "Edit Product");
-                            psLogs.setString(5, fullName + " edited a Product:\n\n" + editNotes);
-                            psLogs.executeUpdate();
-                        }
+        editForm.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                if (editForm.isProductUpdated()) {
+                    String editNotes = JOptionPane.showInputDialog(Admin_Dashboard.this, "Please enter notes about what details you edited:");
+                    if (editNotes == null || editNotes.trim().isEmpty()) {
+                        JOptionPane.showMessageDialog(Admin_Dashboard.this, "No notes provided. The edit action will not be logged.", "Warning", JOptionPane.WARNING_MESSAGE);
+                        return;
                     }
+                    logEditAction(selectedProductID, editNotes, editForm);
                 }
-            } catch (Exception e) {
-                System.out.println("Error logging edit action: " + e.getMessage());
             }
-        }
+        });
+
+        editForm.setVisible(true);
     }//GEN-LAST:event_btnEditProductActionPerformed
 
     private void btnAddProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddProductActionPerformed

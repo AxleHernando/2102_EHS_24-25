@@ -15,7 +15,8 @@ import javax.swing.JOptionPane;
 public class Edit_Products extends javax.swing.JFrame {
     private final Admin_Dashboard adminDashboard;
     private final String selectedProductID;
-    private boolean productUpdated = false;
+    private boolean productUpdated;
+    private String stockNotes;
 
     public Edit_Products(Admin_Dashboard adminDashboard, String productID) {
         initComponents();
@@ -242,6 +243,7 @@ public class Edit_Products extends javax.swing.JFrame {
 
         if (isValid) {
             try (Connection con = DBConnection.Connect()) {
+                String stockQuery = "SELECT Stocks FROM products WHERE ProductID = ?";
                 String query = "UPDATE products SET Name = ?, Description = ?, Price = ?, Stocks = ?, Category = ?, SupplierName = ? WHERE ProductID = ?";
                 
                 String supplier = txtSupplier.getText();
@@ -250,6 +252,20 @@ public class Edit_Products extends javax.swing.JFrame {
                 double price = Double.parseDouble(txtPrice.getText());
                 int stocks = Integer.parseInt(txtStocks.getText());
                 String category = txtCategory.getText();
+                
+                try (PreparedStatement psStock = con.prepareStatement(stockQuery)) {
+                    psStock.setString(1, getProductID());
+                    try (ResultSet rsStock = psStock.executeQuery()) {
+                        if (rsStock.next()) {
+                            int currentStock = rsStock.getInt("Stocks");
+                            if (currentStock > stocks) {
+                                setStockNotes("Stock reduced: " + (currentStock - stocks));
+                            } else if (currentStock < stocks) {
+                                setStockNotes ("Stock added: " + (stocks - currentStock));
+                            }
+                        }
+                    }
+                }
                 
                 try (PreparedStatement ps = con.prepareStatement(query)) {
                     ps.setString(1, product);
@@ -276,40 +292,11 @@ public class Edit_Products extends javax.swing.JFrame {
 
                     if (confirm == JOptionPane.YES_OPTION) {
                         int rowsAffected = ps.executeUpdate();
-                        productUpdated = true;
-                        
-                        String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
-                                + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
-                                + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
-                        try (PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
-                            String userID = UserSession.getCurrentUserID();
-                            String queryUser = "SELECT * FROM users WHERE UserID = ?";
-                            try (PreparedStatement psUser = con.prepareStatement(queryUser)) {
-                                psUser.setString(1, userID);
-                                ResultSet rs = psUser.executeQuery();
-                                if (rs.next()) {
-                                    String fullName = rs.getString("FullName");
-                                    String role = rs.getString("Role");
-
-                                    psLogs.setString(1, userID);
-                                    psLogs.setString(2, fullName);
-                                    psLogs.setString(3, role);
-                                    psLogs.setString(4, "Edit Product");
-                                    psLogs.setString(5, fullName + " Edited a Product:\n\n"
-                                            + "Supplier Name: " + supplier + "\n"
-                                            + "Product: " + product + "\n"
-                                            + "Desciption: " + desc + "\n"
-                                            + "Price: " + formattedPrice + "\n"
-                                            + "Stocks: " + stocks + "\n"
-                                            + "Category: " + category);
-                                    psLogs.executeUpdate();
-                                }
-                            }
-                        }
                         
                         if (rowsAffected > 0) {
                             JOptionPane.showMessageDialog(this, "Product updated successfully!");
                             adminDashboard.refreshProducts();
+                            setProductUpdated(true);
                             this.dispose();
                         } else {
                             JOptionPane.showMessageDialog(this, "Failed to update product.");
@@ -327,6 +314,19 @@ public class Edit_Products extends javax.swing.JFrame {
 
     public boolean isProductUpdated() {
         return productUpdated;
+    }
+    
+    public void setProductUpdated(boolean productUpdated) {
+        this.productUpdated = productUpdated;
+        System.out.println("Product updated flag set to: " + productUpdated);
+    }
+    
+    public String getStockNotes() {
+        return stockNotes;
+    }
+    
+    public void setStockNotes(String notes) {
+        this.stockNotes = notes;
     }
     
     private void saveFileToProjectFolder(java.io.File file, String productId) {

@@ -51,10 +51,17 @@ public class User_Logs extends javax.swing.JFrame {
             String query = "SELECT LogsID, UserID, FullName, Role, Action, DATE_FORMAT(Date, '%m/%d/%Y') AS Date, DATE_FORMAT(Time, '%r') AS Time, Notes FROM user_logs";
             
             if (sortBy != null && !sortBy.isEmpty()) {
-                query += " ORDER BY " + getSortColumn(sortBy) + " "
-                    + (sortOrder != null && (sortOrder.equals("Ascending") || sortOrder.equals("Old") || sortOrder.equals("Admin")) ? "ASC" : "DESC");
+                if (sortBy.equals("Date")) {
+                    query += " ORDER BY Date " + (sortOrder.equalsIgnoreCase("Recent") ? "DESC" : "ASC")
+                            + ", Time " + (sortOrder.equalsIgnoreCase("Recent") ? "DESC" : "ASC");
+                } else {
+                    query += " ORDER BY " + getSortColumn(sortBy) + " "
+                            + (sortOrder.equalsIgnoreCase("Ascending") ? "ASC" : "DESC");
+                }
             }
-
+            
+            System.out.println("Executing Query: " + query);
+            
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
