@@ -690,7 +690,7 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                     ps.setString(1, productId);
                     int rowsAffected = ps.executeUpdate();
 
-                    String queryLogs = "INSERT INTO user_logs (User ID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
+                    String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
                             + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
                             + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
                     String deletedLogs = "INSERT INTO deleted_products (ProductID, Category, Name, Description, Price, Stocks, SupplierName) VALUES ("
@@ -716,10 +716,12 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                                         + "Price: " + price + "\n"
                                         + "Stocks: " + stocks + "\n"
                                         + "Category: " + category + "\n"
-                                        + "Notes: " + removalNotes); // Include removal notes
+                                        + "Notes: " + removalNotes);
                                 psLogs.executeUpdate();
 
                                 try (PreparedStatement psDel = con.prepareStatement(deletedLogs)) {
+                                    price = price.replaceAll("[^\\d.]", "");
+                                    
                                     psDel.setString(1, productId);
                                     psDel.setString(2, category);
                                     psDel.setString(3, product);
