@@ -64,15 +64,20 @@ public class Sales_Table extends javax.swing.JFrame {
             if (sortBy != null && !sortBy.isEmpty()) {
                 if (hasWhereClause) {
                     query += " AND ";
+                } else if (sortBy.equals("Date")) {
+                    query += " ORDER BY Date " + (sortOrder.equalsIgnoreCase("Recent") ? "DESC" : "ASC")
+                            + ", Time " + (sortOrder.equalsIgnoreCase("Recent") ? "DESC" : "ASC");
                 } else {
-                    query += " ORDER BY ";
+                    query += " ORDER BY " + getSortColumn(sortBy) + " "
+                            + (sortOrder.equalsIgnoreCase("Ascending") || sortOrder.equalsIgnoreCase("Lowest") ? "ASC" : "DESC");
                 }
-                query += getSortColumn(sortBy) + " ";
-                query += sortOrder != null && (sortOrder.equals("Ascending") || sortOrder.equals("Lowest") || sortOrder.equals("Old")) ? "ASC" : "DESC";
             }
 
             if (!hasWhereClause && (sortBy == null || sortBy.isEmpty())) {
-                query += " ORDER BY o.OrderID";
+                query += " ORDER BY o.OrderID ASC";
+            } else if (sortBy != null && sortBy.equalsIgnoreCase("OrderID")) {
+                query += " ORDER BY o.OrderID "
+                        + (sortOrder.equalsIgnoreCase("Ascending") || sortOrder.equalsIgnoreCase("Lowest") ? "ASC" : "DESC");
             }
             
             try (PreparedStatement ps = con.prepareStatement(query)) {
@@ -132,13 +137,14 @@ public class Sales_Table extends javax.swing.JFrame {
                     + "FROM orders o "
                     + "JOIN products p ON o.ProductID = p.ProductID "
                     + "JOIN users u ON o.UserID = u.UserID "
-                    + "WHERE LOWER(p.Name) LIKE ? OR LOWER(u.FullName) LIKE ? OR LOWER(o.Category) LIKE ?";
+                    + "WHERE LOWER(p.Name) LIKE ? OR LOWER(u.FullName) LIKE ? OR LOWER(o.Category) LIKE ? OR (o.Date) LIKE ?";
 
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 String searchPattern = "%" + searchText + "%";
                 ps.setString(1, searchPattern);
                 ps.setString(2, searchPattern);
                 ps.setString(3, searchPattern);
+                ps.setString(4, searchPattern);
 
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {

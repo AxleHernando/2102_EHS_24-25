@@ -7,7 +7,6 @@ import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JTable;
@@ -43,7 +42,7 @@ public class Customer_History extends javax.swing.JFrame {
             
             if (sortBy != null && !sortBy.isEmpty()) {
                 query += " ORDER BY " + getSortColumn(sortBy) + " "
-                        + (sortOrder != null && (sortOrder.equals("Ascending") || sortOrder.equals("Old") || sortOrder.equals("Admin")) ? "ASC" : "DESC");
+                    + (sortOrder != null && (sortOrder.equals("Ascending") || sortOrder.equals("Old") || sortOrder.equals("Admin")) ? "ASC" : "DESC");
             }
             
             try (PreparedStatement psUser = con.prepareStatement(queryUser)) {
