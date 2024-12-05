@@ -206,6 +206,7 @@ public class Add_Products extends javax.swing.JFrame {
         if (isValid) {
             try (Connection con = DBConnection.Connect()) {
                 String query = "INSERT INTO products (Name, Description, Price, Stocks, Category, SupplierName) VALUES (?, ?, ?, ?, ?, ?)";
+                String archQuery = "INSERT INTO archived_products (ProductID, Name, Description, Price, Stocks, Category, SupplierName) VAlUES (??, ?, ?, ?, ?, ?)";
                 
                 String supplier = txtSupplier.getText();
                 String product = txtName.getText();
@@ -238,6 +239,7 @@ public class Add_Products extends javax.swing.JFrame {
                     
                     if (confirm == JOptionPane.YES_OPTION) {
                         int rowsAffected = ps.executeUpdate();
+                        String productIDString;
                         
                         String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
                                 + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
@@ -272,7 +274,19 @@ public class Add_Products extends javax.swing.JFrame {
                             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                                 if (generatedKeys.next()) {
                                     int productId = generatedKeys.getInt(1);
-                                    String productIDString = String.valueOf(productId);
+                                    productIDString = String.valueOf(productId);
+
+                                    try (PreparedStatement psArch = con.prepareStatement(archQuery)) {
+                                        psArch.setInt(1, Integer.parseInt(productIDString));
+                                        psArch.setString(2, product);
+                                        psArch.setString(3, desc);
+                                        psArch.setDouble(4, price);
+                                        psArch.setInt(5, stocks);
+                                        psArch.setString(6, category);
+                                        psArch.setString(7, supplier);
+                                        psArch.executeUpdate();
+                                    }
+                                    
                                     saveFileToProjectFolder(selectedFile, productIDString);
                                     JOptionPane.showMessageDialog(this, "Product added successfully!");
                                     adminDashboard.refreshProducts();

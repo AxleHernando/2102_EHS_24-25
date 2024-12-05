@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 29, 2024 at 03:19 AM
+-- Generation Time: Dec 05, 2024 at 04:18 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,53 @@ SET time_zone = "+00:00";
 --
 -- Database: `2102_ehs_2425`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `archived_products`
+--
+
+CREATE TABLE `archived_products` (
+  `ArchiveID` int(11) NOT NULL,
+  `ProductID` int(11) DEFAULT NULL,
+  `Category` varchar(255) DEFAULT NULL,
+  `Name` varchar(255) DEFAULT NULL,
+  `Description` varchar(5000) DEFAULT NULL,
+  `Price` decimal(10,2) DEFAULT NULL,
+  `Stocks` int(11) DEFAULT NULL,
+  `SupplierName` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `archived_products`
+--
+
+INSERT INTO `archived_products` (`ArchiveID`, `ProductID`, `Category`, `Name`, `Description`, `Price`, `Stocks`, `SupplierName`) VALUES
+(1, 47, 'Gaming', 'Mouse', 'A device that can be used for navigating', 300.00, 100, 'Ces Maranan'),
+(2, 46, 'Gaming', 'Mouse', 'A device that can be ued to navigate around the desktop', 400.00, 100, 'Linux Adona'),
+(3, 1, 'Gaming', 'Laptop', 'High-End Gaming Laptop for Gamers', 50000.00, 9, 'Linux Adona'),
+(4, 3, 'Gaming', 'PlayStation 5', 'Next-Gen Gaming Console', 30000.00, 10, 'Linux Adona'),
+(5, 4, 'Gaming', 'Nintendo Switch', 'A Versatile Gaming Console', 20000.00, 10, 'Linux Adona'),
+(6, 14, 'Hygiene', 'Tissues', 'All Around Hygienic Tissue', 20.00, 99, 'Xyreel Laguras'),
+(7, 18, 'Hygiene', 'Toothbrush', 'Soft-Bristled For Gentle Cleaning', 30.00, 500, 'Xyreel Laguras'),
+(8, 19, 'Hygiene', 'Comb', 'Suitable For All Hair Types', 50.00, 200, 'Xyreel Laguras'),
+(9, 20, 'Hygiene', 'Soap', 'Moisturizing And Nourishing', 30.00, 200, 'Xyreel Laguras'),
+(10, 21, 'Hygiene', 'Nailcutter', 'Maintain Clean And Healthy Nails', 45.00, 300, 'Xyreel Laguras'),
+(11, 22, 'Clothes', 'Coat', 'Stay Warm And Stylish', 500.00, 100, 'Rome Dyanne Salvid'),
+(12, 23, 'Clothes', 'T-Shirts', 'Soft, Breathable Fabrics', 400.00, 500, 'Rome Dyanne Salvid'),
+(13, 24, 'Clothes', 'Shorts', 'Comfort In Every Stitch', 450.00, 500, 'Rome Dyanne Salvid'),
+(14, 26, 'Clothes', 'Leggings', 'Soft And Seamless Construction', 150.00, 500, 'Rome Dyanne Salvid'),
+(15, 27, 'Appliances', 'Refrigerator', 'Rapid Cooling Technology', 15000.00, 50, 'Maricris Barcelon'),
+(16, 28, 'Appliances', 'Washing Machine', 'Stain Free, Stress Free', 3400.00, 42, 'Jan Emmanuel Formentos'),
+(17, 29, 'Appliances', 'Vacuum Cleaner', 'Powerful Suction, Quiet Operation', 1500.00, 30, 'Maricris Barcelon'),
+(18, 30, 'Appliances', 'Air Conditioning', 'Cooling Comfort, Effortless Convience', 30000.00, 40, 'Maricris Barcelon'),
+(19, 31, 'Appliances', 'Televisions', 'Experience Stunning Picture Quality', 30000.00, 150, 'Maricris Barcelon'),
+(20, 32, 'Kitchen', 'Pots', 'Cook With Confindence Everytime', 200.00, 500, 'Djanisse Villaflor'),
+(21, 33, 'Kitchen', 'Whisk', 'Mix, Blend, And Stir With Ease', 100.00, 500, 'Djanisse Villaflor'),
+(22, 34, 'Kitchen', 'Graters', 'Precision Grating For Home Cooks', 400.00, 300, 'Djanisse Villaflor'),
+(23, 35, 'Kitchen', 'Canisters', 'Store, Organize And Preserve', 300.00, 100, 'Djanisse Villaflor'),
+(24, 36, 'Kitchen', 'Bowls', 'Versatile And Durable', 200.00, 200, 'Djanisse Villaflor');
 
 -- --------------------------------------------------------
 
@@ -80,23 +127,6 @@ INSERT INTO `cashpayment` (`CashID`, `UserID`, `CashTendered`, `AmountChange`, `
 (12, 22, 100.00, 0.00, '2024-11-23 09:20:05'),
 (13, 21, 100.00, 20.00, '2024-11-21 14:15:30'),
 (14, 26, 5050.00, 30.00, '2024-11-29 09:16:08');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `deleted_products`
---
-
-CREATE TABLE `deleted_products` (
-  `DeletedID` int(11) NOT NULL,
-  `ProductID` int(11) DEFAULT NULL,
-  `Category` varchar(255) DEFAULT NULL,
-  `Name` varchar(255) DEFAULT NULL,
-  `Description` varchar(5000) DEFAULT NULL,
-  `Price` decimal(10,2) DEFAULT NULL,
-  `Stocks` int(11) DEFAULT NULL,
-  `SupplierName` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -201,7 +231,6 @@ INSERT INTO `products` (`ProductID`, `Category`, `Name`, `Description`, `Price`,
 (20, 'Hygiene', 'Soap', 'Moisturizing And Nourishing', 30.00, 200, 'Xyreel Laguras'),
 (21, 'Hygiene', 'Nailcutter', 'Maintain Clean And Healthy Nails', 45.00, 300, 'Xyreel Laguras'),
 (22, 'Clothes', 'Coat', 'Stay Warm And Stylish', 500.00, 100, 'Rome Dyanne Salvid'),
-(23, 'Clothes', 'T-Shirts', 'Soft, Breathable Fabrics', 400.00, 500, 'Rome Dyanne Salvid'),
 (24, 'Clothes', 'Shorts', 'Comfort In Every Stitch', 450.00, 500, 'Rome Dyanne Salvid'),
 (26, 'Clothes', 'Leggings', 'Soft And Seamless Construction', 150.00, 500, 'Rome Dyanne Salvid'),
 (27, 'Appliances', 'Refrigerator', 'Rapid Cooling Technology ', 15000.00, 50, 'Maricris Barcelon'),
@@ -213,9 +242,7 @@ INSERT INTO `products` (`ProductID`, `Category`, `Name`, `Description`, `Price`,
 (33, 'Kitchen', 'Whisk ', 'Mix, Blend, And Stir With Ease', 100.00, 500, 'Djanisse Villaflor'),
 (34, 'Kitchen', 'Graters', 'Precision Grating For Home Cooks', 400.00, 300, 'Djanisse Villaflor'),
 (35, 'Kitchen', 'Canisters', 'Store, Organize And Preserve', 300.00, 100, 'Djanisse Villaflor'),
-(36, 'Kitchen', 'Bowls', 'Versatile And Durable', 200.00, 200, 'Djanisse Villaflor'),
-(46, 'Gaming', 'Mouse', 'A device that can be ued to navigate around the desktop', 400.00, 100, 'Linux Adona'),
-(47, 'Gaming', 'Mouse', 'A device that can be used for navigating', 300.00, 100, 'Ces Maranan');
+(36, 'Kitchen', 'Bowls', 'Versatile And Durable', 200.00, 200, 'Djanisse Villaflor');
 
 -- --------------------------------------------------------
 
@@ -289,11 +316,49 @@ INSERT INTO `user_logs` (`LogsID`, `UserID`, `FullName`, `Role`, `Action`, `Date
 (21, 19, 'Linux Adona', 'Admin', 'Logged Out', '2024-11-29', '09:23:09', 'Linux Adona has Logged Out.'),
 (22, 22, 'John Eduard De Villa', 'Customer', 'Logged In', '2024-11-29', '09:23:12', 'John Eduard De Villa Logged In as Customer.'),
 (23, 22, 'John Eduard De Villa', 'Customer', 'Logged Out', '2024-11-29', '09:26:26', 'John Eduard De Villa has Logged Out.'),
-(24, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-11-29', '09:26:35', 'Linux Adona Logged In as Admin.');
+(24, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-11-29', '09:26:35', 'Linux Adona Logged In as Admin.'),
+(25, 22, 'John Eduard De Villa', 'Customer', 'Logged In', '2024-11-30', '21:41:30', 'John Eduard De Villa Logged In as Customer.'),
+(26, 22, 'John Eduard De Villa', 'Customer', 'Logged Out', '2024-11-30', '21:41:46', 'John Eduard De Villa has Logged Out.'),
+(27, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-11-30', '21:41:52', 'Linux Adona Logged In as Admin.'),
+(28, 19, 'Linux Adona', 'Admin', 'Logged Out', '2024-11-30', '21:43:11', 'Linux Adona has Logged Out.'),
+(29, 22, 'John Eduard De Villa', 'Customer', 'Logged In', '2024-11-30', '21:43:16', 'John Eduard De Villa Logged In as Customer.'),
+(30, 22, 'John Eduard De Villa', 'Customer', 'Logged Out', '2024-11-30', '21:43:26', 'John Eduard De Villa has Logged Out.'),
+(31, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '11:25:31', 'Linux Adona Logged In as Admin.'),
+(32, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '11:30:34', 'Linux Adona Logged In as Admin.'),
+(33, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '11:31:24', 'Linux Adona Logged In as Admin.'),
+(34, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '11:33:07', 'Linux Adona Logged In as Admin.'),
+(35, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '11:34:59', 'Linux Adona Logged In as Admin.'),
+(36, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '11:36:20', 'Linux Adona Logged In as Admin.'),
+(37, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '11:39:16', 'Linux Adona Logged In as Admin.'),
+(38, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '11:40:14', 'Linux Adona Logged In as Admin.'),
+(39, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '11:43:01', 'Linux Adona Logged In as Admin.'),
+(40, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '11:45:22', 'Linux Adona Logged In as Admin.'),
+(41, 21, 'Axle Hernando', 'Customer', 'Logged In', '2024-12-04', '11:46:26', 'Axle Hernando Logged In as Customer.'),
+(42, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '11:46:57', 'Linux Adona Logged In as Admin.'),
+(43, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '12:02:35', 'Linux Adona Logged In as Admin.'),
+(44, 19, 'Linux Adona', 'Admin', 'Remove Product', '2024-12-04', '12:02:44', 'Linux Adona removed a Product:\n\nSupplier Name: Ces Maranan\nProduct: Mouse\nDescription: A device that can be used for navigating\nPrice: ₱300.00\nStocks: 100\nCategory: Gaming\nNotes: out of production'),
+(45, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '12:04:06', 'Linux Adona Logged In as Admin.'),
+(46, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '12:07:39', 'Linux Adona Logged In as Admin.'),
+(47, 19, 'Linux Adona', 'Admin', 'Remove Product', '2024-12-04', '12:07:48', 'Linux Adona removed a Product:\n\nSupplier Name: Linux Adona\nProduct: Mouse\nDescription: A device that can be ued to navigate around the desktop\nPrice: ₱400.00\nStocks: 100\nCategory: Gaming\nNotes: out of production'),
+(48, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '12:11:19', 'Linux Adona Logged In as Admin.'),
+(49, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '12:33:28', 'Linux Adona Logged In as Admin.'),
+(50, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '12:34:15', 'Linux Adona Logged In as Admin.'),
+(51, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '13:20:36', 'Linux Adona Logged In as Admin.'),
+(52, 19, 'Linux Adona', 'Admin', 'Remove Product', '2024-12-04', '13:20:59', 'Linux Adona removed a Product:\n\nSupplier Name: Rome Dyanne Salvid\nProduct: T-Shirts\nDescription: Soft, Breathable Fabrics\nPrice: ₱400.00\nStocks: 500\nCategory: Clothes\nNotes: Out of Prod'),
+(53, 21, 'Axle Hernando', 'Customer', 'Logged In', '2024-12-04', '13:41:34', 'Axle Hernando Logged In as Customer.'),
+(54, 19, 'Linux Adona', 'Admin', 'Logged In', '2024-12-04', '14:12:05', 'Linux Adona Logged In as Admin.'),
+(55, 19, 'Linux Adona', 'Admin', 'Logged Out', '2024-12-04', '14:12:45', 'Linux Adona has Logged Out.'),
+(56, 22, 'John Eduard De Villa', 'Customer', 'Logged In', '2024-12-05', '12:02:16', 'John Eduard De Villa Logged In as Customer.');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `archived_products`
+--
+ALTER TABLE `archived_products`
+  ADD PRIMARY KEY (`ArchiveID`);
 
 --
 -- Indexes for table `cardpayment`
@@ -310,12 +375,6 @@ ALTER TABLE `cashpayment`
   ADD KEY `UserID` (`UserID`);
 
 --
--- Indexes for table `deleted_products`
---
-ALTER TABLE `deleted_products`
-  ADD PRIMARY KEY (`DeletedID`);
-
---
 -- Indexes for table `orderhistory`
 --
 ALTER TABLE `orderhistory`
@@ -326,8 +385,7 @@ ALTER TABLE `orderhistory`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`OrderID`),
-  ADD KEY `CustomerID` (`UserID`),
-  ADD KEY `ProductID` (`ProductID`);
+  ADD KEY `CustomerID` (`UserID`);
 
 --
 -- Indexes for table `products`
@@ -365,12 +423,6 @@ ALTER TABLE `cashpayment`
   MODIFY `CashID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
--- AUTO_INCREMENT for table `deleted_products`
---
-ALTER TABLE `deleted_products`
-  MODIFY `DeletedID` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `orderhistory`
 --
 ALTER TABLE `orderhistory`
@@ -398,7 +450,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_logs`
 --
 ALTER TABLE `user_logs`
-  MODIFY `LogsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `LogsID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- Constraints for dumped tables
@@ -420,8 +472,7 @@ ALTER TABLE `cashpayment`
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`),
-  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`ProductID`) REFERENCES `products` (`ProductID`);
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`);
 
 --
 -- Constraints for table `user_logs`

@@ -693,8 +693,6 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                     String queryLogs = "INSERT INTO user_logs (UserID, FullName, Role, Action, Date, Time, Notes) VALUES (?, ?, ?, ?, "
                             + "STR_TO_DATE(DATE_FORMAT(CURDATE(), '%m/%d/%Y'), '%m/%d/%Y'), "
                             + "DATE_FORMAT(NOW(), '%H:%i:%s'), ?)";
-                    String deletedLogs = "INSERT INTO deleted_products (ProductID, Category, Name, Description, Price, Stocks, SupplierName) VALUES ("
-                            + "?, ?, ?, ?, ?, ?, ?)";
                     try (PreparedStatement psLogs = con.prepareStatement(queryLogs)) {
                         String userID = UserSession.getCurrentUserID();
                         String queryUser = "SELECT * FROM users WHERE UserID = ?";
@@ -718,19 +716,6 @@ public class Admin_Dashboard extends javax.swing.JFrame {
                                         + "Category: " + category + "\n"
                                         + "Notes: " + removalNotes);
                                 psLogs.executeUpdate();
-
-                                try (PreparedStatement psDel = con.prepareStatement(deletedLogs)) {
-                                    price = price.replaceAll("[^\\d.]", "");
-                                    
-                                    psDel.setString(1, productId);
-                                    psDel.setString(2, category);
-                                    psDel.setString(3, product);
-                                    psDel.setString(4, desc);
-                                    psDel.setDouble(5, Double.parseDouble(price));
-                                    psDel.setInt(6, Integer.parseInt(stocks));
-                                    psDel.setString(7, supplier);
-                                    psDel.executeUpdate();
-                                }
                             }
                         }
                         if (rowsAffected > 0) {

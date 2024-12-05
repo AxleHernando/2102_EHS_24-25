@@ -77,7 +77,7 @@ public class User_Logs extends javax.swing.JFrame {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception e) { 
             JOptionPane.showMessageDialog(this, "Error loading user logs data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -401,12 +401,16 @@ public class User_Logs extends javax.swing.JFrame {
     private void comboSortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboSortActionPerformed
         String sortBy = (String) comboSort.getSelectedItem();
         updateSortOrderOptions(sortBy);
+        
         loadUserLogs(sortBy, (String) comboSortOrder.getSelectedItem());
     }//GEN-LAST:event_comboSortActionPerformed
 
     private void comboSortOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboSortOrderActionPerformed
         String sortBy = (String) comboSort.getSelectedItem();
         String sortOrder = (String) comboSortOrder.getSelectedItem();
+        if (sortOrder == null) {
+        sortOrder = "Ascending"; // Default value
+    }
         loadUserLogs(sortBy, sortOrder);
     }//GEN-LAST:event_comboSortOrderActionPerformed
 

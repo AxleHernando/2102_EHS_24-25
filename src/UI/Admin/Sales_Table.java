@@ -52,7 +52,7 @@ public class Sales_Table extends javax.swing.JFrame {
         try (Connection con = DBConnection.Connect()) {
             String query = "SELECT o.OrderID, p.Name, o.Quantity, o.Price, DATE_FORMAT(o.Date, '%m/%d/%Y') AS Date, DATE_FORMAT(o.Time, '%r') AS Time, u.FullName, p.Category, o.ModeOfPayment "
                     + "FROM orders o "
-                    + "JOIN products p ON o.ProductID = p.ProductID "
+                    + "JOIN archived_products p ON o.ProductID = p.ProductID "
                     + "JOIN users u ON o.UserID = u.UserID";
             
             boolean hasWhereClause = false;
@@ -65,19 +65,19 @@ public class Sales_Table extends javax.swing.JFrame {
                 if (hasWhereClause) {
                     query += " AND ";
                 } else if (sortBy.equals("Date")) {
-                    query += " ORDER BY Date " + (sortOrder.equalsIgnoreCase("Recent") ? "DESC" : "ASC")
-                            + ", Time " + (sortOrder.equalsIgnoreCase("Recent") ? "DESC" : "ASC");
+                    query += " ORDER BY Date " + (sortOrder.equals("Recent") ? "DESC" : "ASC")
+                            + ", Time " + (sortOrder.equals("Recent") ? "DESC" : "ASC");
                 } else {
                     query += " ORDER BY " + getSortColumn(sortBy) + " "
-                            + (sortOrder.equalsIgnoreCase("Ascending") || sortOrder.equalsIgnoreCase("Lowest") ? "ASC" : "DESC");
+                            + (sortOrder.equals("Ascending") || sortOrder.equals("Lowest") ? "ASC" : "DESC");
                 }
             }
 
             if (!hasWhereClause && (sortBy == null || sortBy.isEmpty())) {
                 query += " ORDER BY o.OrderID ASC";
-            } else if (sortBy != null && sortBy.equalsIgnoreCase("OrderID")) {
+            } else if (sortBy != null && sortBy.equals("OrderID")) {
                 query += " ORDER BY o.OrderID "
-                        + (sortOrder.equalsIgnoreCase("Ascending") || sortOrder.equalsIgnoreCase("Lowest") ? "ASC" : "DESC");
+                        + (sortOrder.equals("Ascending") || sortOrder.equals("Lowest") ? "ASC" : "DESC");
             }
             
             try (PreparedStatement ps = con.prepareStatement(query)) {
@@ -332,6 +332,7 @@ public class Sales_Table extends javax.swing.JFrame {
             }
         });
 
+        comboSortOrder.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Recent", "Old" }));
         comboSortOrder.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboSortOrderActionPerformed(evt);
@@ -362,7 +363,7 @@ public class Sales_Table extends javax.swing.JFrame {
                                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblSearch)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGap(44, 44, 44)
                                 .addComponent(btnRefresh)
                                 .addGap(34, 34, 34)))
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -376,7 +377,7 @@ public class Sales_Table extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -386,15 +387,16 @@ public class Sales_Table extends javax.swing.JFrame {
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(comboSort, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(comboSortOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(txtSearch)
-                                    .addComponent(lblSearch))
+                                    .addComponent(comboSort)
+                                    .addComponent(lblSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(comboSortOrder)
+                                    .addComponent(txtSearch)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(1, 1, 1)
                                 .addComponent(btnRefresh)))
                         .addGap(11, 11, 11))))
         );
@@ -438,8 +440,12 @@ public class Sales_Table extends javax.swing.JFrame {
 
     private void comboSortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboSortActionPerformed
         String sortBy = (String) comboSort.getSelectedItem();
+        String sortOrder = (String) comboSortOrder.getSelectedItem();
+        if (sortOrder == null) {
+            sortOrder = "Ascending"; // Default value
+        }
         updateSortOrderOptions(sortBy);
-        loadSalesData(null, sortBy, (String) comboSortOrder.getSelectedItem());
+        loadSalesData(null, sortBy, sortOrder);
     }//GEN-LAST:event_comboSortActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
@@ -449,6 +455,9 @@ public class Sales_Table extends javax.swing.JFrame {
     private void comboSortOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboSortOrderActionPerformed
         String sortBy = (String) comboSort.getSelectedItem();
         String sortOrder = (String) comboSortOrder.getSelectedItem();
+        if (sortOrder == null) {
+            sortOrder = "Ascending"; // Default value
+        }
         loadSalesData(null, sortBy, sortOrder);
     }//GEN-LAST:event_comboSortOrderActionPerformed
 
@@ -469,6 +478,7 @@ public class Sales_Table extends javax.swing.JFrame {
                 break;
             default:
                 comboSortOrder.addItem("Ascending");
+                comboSortOrder.addItem("Descending");
                 break;
         }
     }
